@@ -50,6 +50,21 @@
     <ClCompile Include="GeneratedFiles\qrc_wordsmart.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_words.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_words.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_def_notify.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_def_notify.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="def_notify.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="wordsmart.h">
@@ -61,12 +76,24 @@
     <CustomBuild Include="wordsmart.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="words.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="def_notify.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="def_notify.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_wordsmart.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="words.h">
+    <ClInclude Include="GeneratedFiles\ui_def_notify.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HTMLParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

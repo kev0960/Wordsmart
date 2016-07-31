@@ -1,6 +1,4 @@
-﻿  moc_wordsmart.cpp
-  wordsmart.cpp
-  Generating Code...
-  main.cpp
+﻿  wordsmart.cpp
+c:\users\jaebumlee\source\repos\wordsmart\wordsmart\wordsmart\words.h(458): warning C4715: 'Words::get_word_info': not all control paths return a value
   Wordsmart.vcxproj -> C:\Users\JaebumLee\Source\Repos\Wordsmart\Wordsmart\x64\Debug\Wordsmart.exe
   Wordsmart.vcxproj -> C:\Users\JaebumLee\Source\Repos\Wordsmart\Wordsmart\x64\Debug\Wordsmart.pdb (Full PDB)
