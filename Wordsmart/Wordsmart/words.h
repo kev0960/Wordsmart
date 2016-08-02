@@ -4,6 +4,8 @@
 #include <map>
 #include <set>
 #include <utility>
+#include <exception>
+#include <fstream>
 
 #include <QtNetwork>
 #include <QUrl>
@@ -11,7 +13,6 @@
 #include "ui_wordsmart.h"
 #include "HTMLParser.h"
 #include <QtWidgets/QMainWindow>
-
 
 using std::map;
 using std::string;
@@ -48,6 +49,11 @@ class WordInfo : public QObject {
 		return v;
 	}
 
+	std::wstring str_to_wstr(string& s) {
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		return converter.from_bytes(s);
+	}
+
 signals:
 	// Signal when the definition of the word is fully fetched and parsed
 	void def_found(string word);
@@ -77,6 +83,17 @@ public:
 		connect(this, &WordInfo::kr_def_found, this, &WordInfo::parse_done);
 		connect(this, &WordInfo::en_def_found, this, &WordInfo::parse_done);
 	}
+	WordInfo(const WordInfo& w) {
+		word = w.word;
+		kr_definition = w.kr_definition;
+		en_definition = w.en_definition;
+	}
+	WordInfo(string& word, vector<wstring>& kr_definition, vector<wstring>& en_definition)
+		: word(word), kr_definition(kr_definition), en_definition(en_definition)
+	{
+
+	}
+
 	void parse_done() {
 		if (kr_def_parse_done && en_def_parse_done) {
 			emit def_found(word);
@@ -93,7 +110,7 @@ public:
 
 		/*
 		
-		DAUM English Dictionary Format
+		DAUM English Dictionary Response Format
 
 		<ul class="list_search">
 			<li>
@@ -104,6 +121,9 @@ public:
 
 				** To parse this, we need to get each partial part of
 				the meaning and concantenate it. 
+
+				** sometimes the response does not contain <daum:word> but instead
+				just a simple <span class="text_search">
 
 			</li>
 			<li>
@@ -137,99 +157,27 @@ public:
 
 				int from = found;
 				for (; itr != parser.DOM().end(); ++itr) {
-					if (itr->tag == L"daum:word") {
-						definition += itr->inner_text;
+					if (itr->tag == L"span" && itr->attr[L"class"] == L"txt_search") {
+						wstring inside = itr->inner_html;
+						// strip off tags
+						int x = inside.find(L"<");
+						int y = inside.find(L">");
 
-						from = def.find(L"</daum:word>", from + 1);
-						if (def[from + 12] == L' ') definition += L' ';
-					}
-				}
+						while (x != wstring::npos) {
+							inside.erase(x, y - x + 1);
 
-				if (definition.empty()) {
-					itr = temp_itr;
-					for (; itr != parser.DOM().end(); ++itr) {
-						if (itr->tag == L"span" && itr->attr[L"class"] == L"txt_search") {
-							definition = itr->inner_text;
+							x = inside.find(L"<");
+							y = inside.find(L">");
 						}
+						kr_definition.push_back(inside);
+						break;
 					}
 				}
-
-				kr_definition.push_back(definition);
 
 				found = def.find(L"<li>", end + 1);
 			}
 		}
 	}
-
-	/*
-	void parse_kr_dic() {
-		kr_def_parse_done = true;
-
-		// Network Error occured
-		if (response_kr->error() != QNetworkReply::NoError) {
-			emit kr_def_found();
-			return;
-		}
-
-		QString html = QString::fromUtf8(response_kr->readAll());
-		wstring html_str = html.toStdWString();
-
-		
-
-		NAVER English Dictionary has following format
-
-		<dl class="list_e2">
-			...
-			<span class="fnt_k09"> { Noun Verb Adj etc. } </span>
-			<span class="fnt_k05"> { Meaning of the word } </span>
-
-			...
-			<a href="..." class="fnt_k22 N=a....random string"> { Other Meanings } </a>
-			<a href="..." class="fnt_k22 N=a....random string"> { Other Meanings } </a>
-		</dl>
-
-
-		
-		wstring key_class = L"<dl class=\"list_e2\">";
-		wstring end_tag = L"</dl>";
-
-		auto found = html_str.find(key_class);
-		auto end = html_str.find(end_tag, found);
-		wstring def = html_str.substr(found, end + 5 - found);
-
-		Parser::HTMLParser parser(def);
-		Parser::DOMTree::iterator itr = parser.DOM().begin();
-
-		for (; itr != parser.DOM().end(); ++itr) {
-			if (itr->tag == L"span" && itr->attr[L"class"] == L"fnt_k09") {
-				definition.push_back(itr->inner_text);
-				break;
-			}
-		}
-
-		for (; itr != parser.DOM().end(); ++itr) {
-			if (itr->tag == L"span" && itr->attr[L"class"] == L"fnt_k05") {
-				if (definition.size()) definition[0] += L"  " + itr->inner_text;
-				else definition.push_back(itr->inner_text);
-
-				break;
-			}
-		}
-
-		// Additional definitions
-		for (; itr != parser.DOM().end(); ++itr) {
-			if (itr->tag == L"a") {
-				if (itr->attr[L"class"].size() >= 7 && itr->attr[L"class"].substr(0, 7) == L"fnt_k22") {
-					definition.push_back(itr->inner_text);
-				}
-			}
-			if (itr->tag == L"dd") break;
-		}
-
-		emit kr_def_found();
-	}
-	*/
-
 	void parse_en_dic() {
 		en_def_parse_done = true;
 
@@ -358,7 +306,37 @@ public:
 	string get_word() const { return word;  }
 	void inc_freqeuncy() { frequency++; }
 	int get_frequency() { return frequency; }
+
+	/*
+
+	File output format
+
+	<wordlist>
+		<word word="{ Word }">
+			<kr_def> { Korean Definition } </kr_def>
+			<en_def> { English Definition } </en_def>
+			<mem_date result="{ Mem count }"> { Date when last memorized } </mem_date>
+		</word>
+	</wordlist>
+
+	*/
+
+	bool write_file(std::wofstream& o) {
+		if (!o) return false;
+
+		o << L"<word word=\"" << str_to_wstr(word) << L"\">";
+		for (int i = 0; i < kr_definition.size(); i++) {
+			o << L"<kr_def>" << kr_definition[i] << L"</kr_def>";
+		}
+		for (int i = 0; i < en_definition.size(); i++) {
+			o << L"<en_def>" << en_definition[i] << L"</en_def>";
+		}
+		o << "</word>\n";
+		return true;
+	}
 };
+
+
 
 class Words : public QObject {
 	Q_OBJECT
@@ -373,6 +351,11 @@ class Words : public QObject {
 		for (int i = 0; i < word.size(); i++) {
 			word[i] = tolower(word[i]);
 		}
+	}
+
+	string wstr_to_str(wstring& wstr) {
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		return converter.to_bytes(wstr);
 	}
 
 signals:
@@ -451,10 +434,78 @@ public:
 		return found_words;
 	}
 
-	WordInfo& get_word_info(string w) {
+	WordInfo get_word_info(string w) {
 		if (found_words.find(w) != found_words.end()) {
 			return registered_words[w];
 		}
+		return WordInfo("");
+	}
+
+	bool write_save_file(std::wofstream& out) {
+		if (!out) return false;
+
+		out << L"<wordlist>";
+		for (auto itr = found_words.begin(); itr != found_words.end(); itr++) {
+			registered_words[*itr].write_file(out);
+		}
+		out << L"</wordlist>";
+
+		return true;
+	}
+	bool delete_word(string word) {
+		if (registered_words.find(word) != registered_words.end()) {
+			registered_words.erase(word);
+			found_words.erase(word);
+			return true;
+		}
+		return false;
+	}
+	bool read_save_file(std::wifstream& in) {
+		if (!in) return false;
+
+		wstring file_data; 
+		wstring temp;
+		while (getline(in, temp)) {
+			file_data += temp;
+		}
+
+		Parser::HTMLParser parser(file_data);
+		Parser::DOMTree::iterator itr = parser.DOM().begin();
+
+		wstring current_word; 
+		vector<wstring> kr_definition, en_definition;
+
+		for (; itr != parser.DOM().end(); ++itr) {
+			if (itr->tag == L"word") {
+				if (current_word.size()) {
+					// Register the previous current_word
+					string s_word = wstr_to_str(current_word);
+					found_words.insert(s_word);
+					registered_words.emplace(
+						s_word, 
+						WordInfo(s_word, kr_definition, en_definition));
+
+					kr_definition.clear();
+					en_definition.clear();
+				}
+				current_word = itr->attr[L"word"];
+			}
+			else if (itr->tag == L"kr_def") {
+				kr_definition.push_back(itr->inner_html);
+			}
+			else if (itr->tag == L"en_def") {
+				en_definition.push_back(itr->inner_html);
+			}
+		}
+
+		if (current_word.size()) {
+			// Register the previous current_word
+			string s_word = wstr_to_str(current_word);
+			found_words.insert(s_word);
+			registered_words.emplace(s_word, WordInfo(s_word, kr_definition, en_definition));
+		}
+
+		return true;
 	}
 
 	Words() : QObject(Q_NULLPTR) {

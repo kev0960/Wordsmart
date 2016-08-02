@@ -85,7 +85,7 @@ public:
         textBrowser = new QTextBrowser(page);
         textBrowser->setObjectName(QStringLiteral("textBrowser"));
         QFont font;
-        font.setFamily(QStringLiteral("Verdana"));
+        font.setFamily(QString::fromUtf8("\353\247\221\354\235\200 \352\263\240\353\224\225"));
         font.setPointSize(10);
         textBrowser->setFont(font);
         textBrowser->setTextInteractionFlags(Qt::NoTextInteraction);
@@ -164,7 +164,7 @@ public:
 
         retranslateUi(WordsmartClass);
 
-        stackedWidget->setCurrentIndex(0);
+        stackedWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(WordsmartClass);
@@ -179,10 +179,10 @@ public:
         textBrowser->setHtml(QApplication::translate("WordsmartClass", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", 0));
+"</style></head><body style=\" font-family:'\353\247\221\354\235\200 \352\263\240\353\224\225'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana';\"><br /></p></body></html>", 0));
         groupBox->setTitle(QApplication::translate("WordsmartClass", "GroupBox", 0));
-        pushButton_2->setText(QApplication::translate("WordsmartClass", "PushButton", 0));
+        pushButton_2->setText(QApplication::translate("WordsmartClass", "Delete Word", 0));
         pushButton->setText(QApplication::translate("WordsmartClass", "PushButton", 0));
         menuWho->setTitle(QApplication::translate("WordsmartClass", "Help", 0));
         menu->setTitle(QApplication::translate("WordsmartClass", "Learn Words", 0));

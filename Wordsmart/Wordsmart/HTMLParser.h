@@ -18,6 +18,9 @@ namespace Parser {
 		map<wstring, wstring> attr;
 		wstring inner_text;
 
+		wstring inner_html;
+		size_t tag_start;
+
 		HTMLElement* parent;
 		vector<HTMLElement*> children;
 
@@ -118,9 +121,21 @@ namespace Parser {
 			e->parent = cursor;
 			cursor = e;
 		}
+		// Do not move a cursor
+		void add_void_element(HTMLElement *e) {
+			cursor->children.push_back(e);
+			e->parent = cursor;
+		}
 		void add_text(wstring text) {
 			if (cursor == top) return;
 			cursor->inner_text += text;
+		}
+
+		void set_html_start_location(size_t start) {
+			cursor->tag_start = start;
+		}
+		void set_inner_html(wstring& s, size_t end) {
+			cursor->inner_html = s.substr(cursor->tag_start, end - cursor->tag_start + 1);
 		}
 
 		iterator begin() {
@@ -130,6 +145,37 @@ namespace Parser {
 		iterator end() {
 			return iterator(top, *this);
 		}
+
+		void print() {
+			FILE* fp = fopen("test.txt", "w" );
+			print_tree(top, fp);
+			fclose(fp);
+		}
+		void print_space(int n, FILE* fp) {
+			for (int i = 0; i < n; i++) fwprintf(fp, L" ");
+		}
+
+		void print_tree(HTMLElement* current, FILE* fp, int level = 0) {
+			print_space(level, fp);
+			fwprintf(fp, L"< %ws >\n", current->tag.c_str());
+
+			//std::wcout << "<" << current->tag << ">" << std::endl;
+
+			if (current->inner_html.size()) {
+				print_space(level, fp);
+				//std::wcout << "{" << current->inner_text << "}" << std::endl;
+				fwprintf(fp, L"{ %ws }\n", current->inner_html.c_str());
+			}
+			for (auto itr = current->attr.begin(); itr != current->attr.end(); itr++) {
+				print_space(level, fp);
+				//std::wcout << "[ " << itr->first << " ] " << itr->second << std::endl;
+				fwprintf(fp, L"[ %ws ] %ws\n", itr->first.c_str(), itr->second.c_str());
+			}
+
+			for (size_t i = 0; i < current->children.size(); i++) {
+				print_tree(current->children[i], fp, level + 1);
+			}
+		}
 	};
 
 	class HTMLParser
@@ -138,7 +184,7 @@ namespace Parser {
 		DOMTree dom_tree;
 
 		bool is_void_element(wstring tag) {
-			vector<wstring> arr = { L"area", L"base", L"br", L"col", L"command",
+			vector<wstring> arr = { L"area", L"base", L"br", L"br/", L"col", L"command",
 				L"embed", L"hr", L"img", L"input", L"keygen", L"link",
 				L"meta", L"param", L"source", L"track", L"wbr" };
 
@@ -162,10 +208,15 @@ namespace Parser {
 
 				// If tag name is empty, then it is a closing tag
 				if (e.tag == L"") {
+					dom_tree.set_inner_html(html, found - 1);
 					dom_tree.level_up();
+				}
+				else if (is_void_element(e.tag)) {
+					dom_tree.add_void_element(new HTMLElement(e));
 				}
 				else if (e.tag != L"!--") {
 					dom_tree.add_element(new HTMLElement(e));
+					dom_tree.set_html_start_location(end + 1);
 				}
 				found = html.find(open_bracket, end + 1);
 
@@ -176,6 +227,8 @@ namespace Parser {
 					dom_tree.add_text(temp);
 				}
 			}
+			dom_tree.print();
+		
 		}
 
 		void strip_whitespace(wstring& s) {

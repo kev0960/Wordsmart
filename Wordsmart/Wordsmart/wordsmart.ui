@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -26,7 +26,7 @@
          <widget class="QTextBrowser" name="textBrowser">
           <property name="font">
            <font>
-            <family>Verdana</family>
+            <family>맑은 고딕</family>
             <pointsize>10</pointsize>
            </font>
           </property>
@@ -34,8 +34,8 @@
            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'맑은 고딕'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana';&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textInteractionFlags">
            <set>Qt::NoTextInteraction</set>
@@ -71,7 +71,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QTextBrowser" name="textBrowser_2">
              <property name="font">
               <font>
-               <family>Verdana</family>
+               <family>맑은 고딕</family>
                <pointsize>10</pointsize>
               </font>
              </property>
@@ -80,7 +80,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QPushButton" name="pushButton_2">
              <property name="text">
-              <string>PushButton</string>
+              <string>Delete Word</string>
              </property>
             </widget>
            </item>

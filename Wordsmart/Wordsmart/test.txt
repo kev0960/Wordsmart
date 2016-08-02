@@ -1,0 +1,13 @@
+<  >
+ < li >
+ { <a href="webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=embedded&amp;i=3&amp;h=0000#c">S:</a><a class="pos"> (adj) </a><b>embedded</b> (inserted as an integral part of a surrounding whole) <i>"confused by the embedded Latin quotations"; "an embedded subordinate clause"</i> }
+  < a >
+  { S: }
+  [ href ] webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=embedded&amp;i=3&amp;h=0000#c
+  < a >
+  {  (adj)  }
+  [ class ] pos
+  < b >
+  { embedded }
+  < i >
+  { "confused by the embedded Latin quotations"; "an embedded subordinate clause" }

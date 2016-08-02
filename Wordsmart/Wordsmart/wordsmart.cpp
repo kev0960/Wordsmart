@@ -13,13 +13,27 @@ Wordsmart::Wordsmart(QWidget *parent)
 	create_action();
 
 	connect(ui.listWidget, &QListWidget::itemPressed, this, &Wordsmart::list_word_clicked);
-	
+	connect(ui.pushButton_2, &QPushButton::clicked, this, &Wordsmart::delete_word);
+
 	ui.textBrowser->viewport()->installEventFilter(this);
+
 
 	notification = new Notify;
 }
+bool Wordsmart::load_saved_wordlist()
+{
+	std::wifstream in("saved_wordlist.wrd");
+	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
+	in.imbue(loc);
+
+	bool result = my_words.read_save_file(in);
+	if(result) my_flash_card.set_word_list(my_words.get_word_list()); 
+
+	fetch_word_list();
+	return result;
+}
 bool Wordsmart::eventFilter(QObject* target, QEvent* event) {
-	
+
 	if (target == ui.textBrowser->viewport() && event->type() == QEvent::MouseButtonPress) {
 		QMouseEvent *e = dynamic_cast<QMouseEvent *>(event);
 
@@ -32,18 +46,49 @@ bool Wordsmart::eventFilter(QObject* target, QEvent* event) {
 	return QWidget::eventFilter(target, event);
 }
 void Wordsmart::show_flashcard() {
-	ui.textBrowser->document()->setDefaultStyleSheet("p{margin-top:30px}");
-	if (my_flash_card.is_showing_word()) {
-		QString qs = "<p style='padding-top:30px;color:blue;'>";
-		qs += my_flash_card.get_word().c_str();
-		qs += "</p>";
+	if (my_flash_card.is_flashcard_empty()) {
+		string top_margin = std::to_string(ui.textBrowser->size().height() / 2 - 85);
+		QString qs = "<br><p align=\"center\" style=\"font-size:50px;margin-top:";
+		qs += top_margin.c_str();
+		qs += "\">Your Flashcard is Empty!</p>";
 
+		ui.textBrowser->setText(qs);
+		return;
+	}
+
+	if (my_flash_card.is_showing_word()) {
+		QString qs = "<div align=\"right\" style=\"font-size:small;vertical-align:top;";
+
+		switch (my_flash_card.memorize_count()) {
+		case 0:
+		case 1:
+			qs += "color:red;\">";
+			break;
+		case 2:
+			qs += "color:yellow;\">";
+			break;
+		case 3:
+			qs += "color:green;\">";
+			break;
+		}
+		qs += QString::fromWCharArray(L"¡Ü");
+
+
+		string top_margin = std::to_string(ui.textBrowser->size().height() / 2 - 85);
+		qs += "</div><br><p align=\"center\" style=\"font-size:50px;margin-top:";
+		qs += top_margin.c_str();
+		qs += "\">";
+
+		string word = my_flash_card.get_word();
+		word[0] = toupper(word[0]);
+
+		qs += word.c_str();
+		qs += "</p>";
 		// Set to show the word
-		ui.textBrowser->setHtml(qs);
-		//ui.textBrowser->setAlignment(Qt::AlignCenter);
+		ui.textBrowser->setText(qs);
 	}
 	else {
-		WordInfo& w = my_words.get_word_info(my_flash_card.get_word());
+		WordInfo w = my_words.get_word_info(my_flash_card.get_word());
 
 		QString qs = "<h2 style='font-family:Verdana'> ";
 		string word = w.get_word().c_str();
@@ -67,12 +112,20 @@ void Wordsmart::show_flashcard() {
 	}
 }
 void Wordsmart::flashcard_clicked(int x) {
+	if (my_flash_card.is_flashcard_empty()) {
+		show_flashcard();
+		return;
+	}
+
 	my_flash_card.flip();
 
 	if (my_flash_card.is_showing_word()) {
 		// User memorized the word
 		if (x > ui.textBrowser->size().width() / 2) {
 			my_flash_card.user_memorized();
+		}
+		else {
+			my_flash_card.user_forgot();
 		}
 
 		my_flash_card.next_word();
@@ -92,9 +145,9 @@ void Wordsmart::show_version()
 	msgBox.exec();
 }
 void Wordsmart::create_action() {
-	ui.actionVersion->setStatusTip(tr("Show me the version of this program"));
-	ui.actionFlash_Cards->setStatusTip(tr("Show flash card of your word list"));
-	ui.actionYour_Word_List->setStatusTip(tr("Show list of your words"));
+	ui.actionVersion->setStatusTip(tr("Show the version of this program"));
+	ui.actionFlash_Cards->setStatusTip(tr("Show the flash card of your word list"));
+	ui.actionYour_Word_List->setStatusTip(tr("Show the list of your words"));
 
 	connect(ui.actionVersion, &QAction::triggered, this, &Wordsmart::show_version);
 	connect(ui.actionFlash_Cards, &QAction::triggered, this, &Wordsmart::flash_cards);
@@ -134,16 +187,25 @@ void Wordsmart::word_list() {
 	fetch_word_list();
 }
 void Wordsmart::word_is_found(const WordInfo& w)
-{	
+{
 	notification->show_notification(w);
 	fetch_word_list();
 	my_flash_card.set_word_list(my_words.get_word_list());
-}
-void Wordsmart::list_word_clicked(QListWidgetItem *item) 
-{
-	WordInfo& w = my_words.get_word_info(item->text().toStdString());
 
-	QString qs = "<h2 style='font-family:Verdana'> ";
+	std::wofstream out("saved_wordlist.wrd");
+
+	// Sine MSVC does not have support on UTF-8 output, we have to 
+	// manually specify it
+	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
+	out.imbue(loc);
+	my_words.write_save_file(out);
+}
+void Wordsmart::list_word_clicked(QListWidgetItem *item)
+{
+	current_selected_word = item->text().toStdString();
+	WordInfo& w = my_words.get_word_info(current_selected_word);
+
+	QString qs = "<h2> ";
 	string word = w.get_word().c_str();
 	word[0] = toupper(word[0]);
 	qs += word.c_str();
@@ -162,6 +224,22 @@ void Wordsmart::list_word_clicked(QListWidgetItem *item)
 	}
 	qs += "</ul>";
 	ui.textBrowser_2->setText(qs);
+}
+void Wordsmart::delete_word()
+{
+	if (!current_selected_word.size()) return;
+	my_words.delete_word(current_selected_word);
+
+	fetch_word_list();
+	my_flash_card.set_word_list(my_words.get_word_list());
+
+	std::wofstream out("saved_wordlist.wrd");
+
+	// Sine MSVC does not have support on UTF-8 output, we have to 
+	// manually specify it
+	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
+	out.imbue(loc);
+	my_words.write_save_file(out);
 }
 Wordsmart::~Wordsmart()
 {

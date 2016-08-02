@@ -9,7 +9,7 @@
 class FlashCard
 {
 	vector<string> word_list;
-	vector<bool> memorized;
+	vector<int> memorized;
 
 	int current_word;
 	bool flashcard_showing_word;
@@ -27,7 +27,10 @@ public:
 			word_list[i] = *itr;
 		}
 
-		memorized.resize(word_list.size(), false);
+		memorized.resize(word_list.size(), 0);
+		for (i = 0; i < memorized.size(); i++) {
+			memorized[i] = 0;
+		}
 	}
 
 	void flip() {
@@ -35,7 +38,18 @@ public:
 	}
 
 	void user_memorized() {
-		memorized[current_word] = true;
+		memorized[current_word] ++ ;
+
+		if (memorized[current_word] > 3) {
+			memorized[current_word] = 3;
+		}
+	}
+	void user_forgot() {
+		memorized[current_word] = 0;
+	}
+
+	int memorize_count() {
+		return memorized[current_word];
 	}
 
 	// When it goes to the last word, it comes back to the first one
@@ -57,6 +71,10 @@ public:
 	bool is_showing_word() {
 		return flashcard_showing_word;
 	}
+
+	bool is_flashcard_empty() {
+		return word_list.empty();
+	}
 };
 class Wordsmart : public QMainWindow
 {
@@ -65,6 +83,8 @@ class Wordsmart : public QMainWindow
 public:
 	Wordsmart(QWidget *parent = 0);
 	~Wordsmart();
+
+	bool load_saved_wordlist();
 
 private:
 	Ui::WordsmartClass ui;
@@ -84,6 +104,7 @@ private:
 	// Show Word List
 	void word_list();
 	void fetch_word_list();
+	void delete_word();
 
 	void word_is_found(const WordInfo& w);
 	void list_word_clicked(QListWidgetItem *item);
@@ -91,6 +112,7 @@ private:
 	QClipboard* clipboard;
 
 	Words my_words;
+	string current_selected_word;
 
 	// Because qttextbrowser does not support click event, we have to manually 
 	// override it through installing custom eventfilter
