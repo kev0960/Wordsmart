@@ -21,6 +21,15 @@ Notify::~Notify() {
 
 void Notify::show_notification(const WordInfo& w)
 {
+	/*
+	if (timer) {
+		timer->stop();
+		delete timer;
+
+		timer = new QTimer(this);
+
+	}*/
+
 	QString qs = "<h2 style='font-family:Verdana'> ";
 	string word = w.get_word().c_str();
 	word[0] = toupper(word[0]);

@@ -1,0 +1,12 @@
+<  >
+ < li >
+ { <a href="webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=tool&amp;i=7&amp;h=00000000#c">S:</a><a class="pos"> (v) </a><b>tool</b> (work with a tool) <i></i> }
+  < a >
+  { S: }
+  [ href ] webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=tool&amp;i=7&amp;h=00000000#c
+  < a >
+  {  (v)  }
+  [ class ] pos
+  < b >
+  { tool }
+  < i >

@@ -7,6 +7,7 @@
 #include <exception>
 #include <fstream>
 
+
 #include <QtNetwork>
 #include <QUrl>
 #include <QNetworkAccessManager>
@@ -62,6 +63,8 @@ signals:
 
 public:
 	WordInfo(string word) : word(word), kr_def_parse_done(false), en_def_parse_done(false), QObject(Q_NULLPTR) {
+		if (word == "") return;
+
 		string url_kr_dic =
 			"http://alldic.daum.net/search.do?q="
 			+ word;
@@ -88,10 +91,19 @@ public:
 		kr_definition = w.kr_definition;
 		en_definition = w.en_definition;
 	}
-	WordInfo(string& word, vector<wstring>& kr_definition, vector<wstring>& en_definition)
+	WordInfo(string word, vector<wstring>& kr_definition, vector<wstring>& en_definition)
 		: word(word), kr_definition(kr_definition), en_definition(en_definition)
 	{
 
+	}
+
+	WordInfo& operator= (WordInfo&& w) 
+	{
+		word = w.word;
+		kr_definition = w.kr_definition;
+		en_definition = w.en_definition;
+
+		return *this;
 	}
 
 	void parse_done() {
@@ -108,12 +120,15 @@ public:
 			return;
 		}
 
+		response_kr->close();
+
 		/*
 		
 		DAUM English Dictionary Response Format
 
 		<ul class="list_search">
 			<li>
+				<span text_search="">
 				<daum:word> { Meaning } </daum:word>
 				<daum:word> { of } </daum:word>
 				<daum:word> { the } </daum:word>
@@ -186,6 +201,8 @@ public:
 			emit en_def_found();
 			return;
 		}
+
+		response_en->close();
 
 		wstring html = QString::fromUtf8(response_en->readAll()).toStdWString();
 		wstring key_tag = L"<li>";
@@ -341,7 +358,8 @@ public:
 class Words : public QObject {
 	Q_OBJECT
 
-	map<string, WordInfo> registered_words;
+public:
+	map<string, WordInfo*> registered_words;
 
 	// Found word 
 	std::set<string> found_words;
@@ -370,14 +388,15 @@ public:
 		found_words.insert(word);
 
 		if (registered_words.find(word) == registered_words.end()) {
-			registered_words.emplace(std::make_pair(word, word));
+			WordInfo* word_info = new WordInfo(word);
+			registered_words[word] = word_info;
 
 			// When the definition of this word is found, it callbacks to the word_is_found function
-			connect(&registered_words[word], &WordInfo::def_found, this, &Words::word_is_found);
+			connect(registered_words[word], &WordInfo::def_found, this, &Words::word_is_found);
 		}
 		else {
 			// If the word is already registered, we inc the freqeuncy
-			registered_words[word].inc_freqeuncy();
+			registered_words[word]->inc_freqeuncy();
 
 			// emit the signal
 			word_is_found(word);
@@ -387,7 +406,7 @@ public:
 	}
 
 	void word_is_found(string word) {
-		emit defFound(registered_words[word]);
+		emit defFound(*registered_words[word]);
 	}
 
 	// Check whether the word is in a correct format and fix it
@@ -402,6 +421,7 @@ public:
 
 	bool is_word(string& word) {
 		bool separate_found = false;
+		if (word.size() >= 30) return false; 
 
 		for (int i = 0; i < word.size(); i++) {
 			if (word[i] == ' ') separate_found = true;
@@ -434,11 +454,11 @@ public:
 		return found_words;
 	}
 
-	WordInfo get_word_info(string w) {
+	WordInfo* get_word_info(string w) {
 		if (found_words.find(w) != found_words.end()) {
 			return registered_words[w];
 		}
-		return WordInfo("");
+		return nullptr;
 	}
 
 	bool write_save_file(std::wofstream& out) {
@@ -446,7 +466,7 @@ public:
 
 		out << L"<wordlist>";
 		for (auto itr = found_words.begin(); itr != found_words.end(); itr++) {
-			registered_words[*itr].write_file(out);
+			registered_words[*itr]->write_file(out);
 		}
 		out << L"</wordlist>";
 
@@ -472,6 +492,7 @@ public:
 		Parser::HTMLParser parser(file_data);
 		Parser::DOMTree::iterator itr = parser.DOM().begin();
 
+		
 		wstring current_word; 
 		vector<wstring> kr_definition, en_definition;
 
@@ -481,10 +502,9 @@ public:
 					// Register the previous current_word
 					string s_word = wstr_to_str(current_word);
 					found_words.insert(s_word);
-					registered_words.emplace(
-						s_word, 
-						WordInfo(s_word, kr_definition, en_definition));
 
+					registered_words[s_word] = new WordInfo(s_word, kr_definition, en_definition);
+					
 					kr_definition.clear();
 					en_definition.clear();
 				}
@@ -502,8 +522,9 @@ public:
 			// Register the previous current_word
 			string s_word = wstr_to_str(current_word);
 			found_words.insert(s_word);
-			registered_words.emplace(s_word, WordInfo(s_word, kr_definition, en_definition));
+			registered_words[s_word] = new WordInfo(s_word, kr_definition, en_definition);
 		}
+		
 
 		return true;
 	}

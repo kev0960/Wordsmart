@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <QDesktopWidget>
 #include <QMouseEvent>
+#include <QTimer>
 #include "ui_def_notify.h"
 #include "words.h"
 class Notify : public QDialog
@@ -21,4 +22,6 @@ signals:
 
 private:
 	Ui::Dialog *ui;
+	QTimer* timer;
+
 };

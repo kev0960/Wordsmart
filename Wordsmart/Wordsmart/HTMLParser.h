@@ -41,6 +41,13 @@ namespace Parser {
 		HTMLElement* top;
 		HTMLElement* cursor;
 
+		bool delete_element(HTMLElement* e) {
+			for (int i = 0; i < e->children.size(); i++) {
+				delete_element(e->children[i]);
+			}
+			delete e;
+		}
+
 	public:
 		class iterator {
 			HTMLElement* curr;
@@ -139,6 +146,8 @@ namespace Parser {
 		}
 
 		iterator begin() {
+			if (top->children.size() == 0) return iterator(top, *this);
+
 			return iterator(top->children[0], *this);
 		}
 
@@ -146,35 +155,8 @@ namespace Parser {
 			return iterator(top, *this);
 		}
 
-		void print() {
-			FILE* fp = fopen("test.txt", "w" );
-			print_tree(top, fp);
-			fclose(fp);
-		}
-		void print_space(int n, FILE* fp) {
-			for (int i = 0; i < n; i++) fwprintf(fp, L" ");
-		}
+		~DOMTree() {
 
-		void print_tree(HTMLElement* current, FILE* fp, int level = 0) {
-			print_space(level, fp);
-			fwprintf(fp, L"< %ws >\n", current->tag.c_str());
-
-			//std::wcout << "<" << current->tag << ">" << std::endl;
-
-			if (current->inner_html.size()) {
-				print_space(level, fp);
-				//std::wcout << "{" << current->inner_text << "}" << std::endl;
-				fwprintf(fp, L"{ %ws }\n", current->inner_html.c_str());
-			}
-			for (auto itr = current->attr.begin(); itr != current->attr.end(); itr++) {
-				print_space(level, fp);
-				//std::wcout << "[ " << itr->first << " ] " << itr->second << std::endl;
-				fwprintf(fp, L"[ %ws ] %ws\n", itr->first.c_str(), itr->second.c_str());
-			}
-
-			for (size_t i = 0; i < current->children.size(); i++) {
-				print_tree(current->children[i], fp, level + 1);
-			}
 		}
 	};
 
@@ -227,11 +209,11 @@ namespace Parser {
 					dom_tree.add_text(temp);
 				}
 			}
-			dom_tree.print();
-		
 		}
 
 		void strip_whitespace(wstring& s) {
+			if (s.size() == 0) return;
+
 			// size_t is unsigned int 
 			for (size_t i = s.size() - 1; i >= 0; i--) {
 				if (s[i] == L'\t' || s[i] == L'\n' || s[i] == L'\r') {
@@ -242,6 +224,8 @@ namespace Parser {
 		}
 
 		void remove_trailing_whitespace(wstring& s) {
+			if (s.size() == 0) return;
+
 			for (int i = s.length() - 1; i >= 0; i--) {
 				if (s[i] == ' ') s.erase(s.begin() + i);
 				else break;

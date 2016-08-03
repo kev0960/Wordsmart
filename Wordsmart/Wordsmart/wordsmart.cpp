@@ -16,8 +16,12 @@ Wordsmart::Wordsmart(QWidget *parent)
 	connect(ui.pushButton_2, &QPushButton::clicked, this, &Wordsmart::delete_word);
 
 	ui.textBrowser->viewport()->installEventFilter(this);
-
-
+	
+	string f = "Test";
+	vector<wstring> a = { L"no" };
+	vector<wstring> b = { L"no" };
+	WordInfo x(f, a, b );
+	my_words.registered_words["hey"] = (WordInfo*)&x;
 	notification = new Notify;
 }
 bool Wordsmart::load_saved_wordlist()
@@ -26,20 +30,23 @@ bool Wordsmart::load_saved_wordlist()
 	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
 	in.imbue(loc);
 
-	bool result = my_words.read_save_file(in);
+	bool result = false;
+	result = my_words.read_save_file(in);
 	if(result) my_flash_card.set_word_list(my_words.get_word_list()); 
 
 	fetch_word_list();
 	return result;
 }
 bool Wordsmart::eventFilter(QObject* target, QEvent* event) {
-
 	if (target == ui.textBrowser->viewport() && event->type() == QEvent::MouseButtonPress) {
 		QMouseEvent *e = dynamic_cast<QMouseEvent *>(event);
 
-		int x = e->x();
-		ui.textBrowser->setText(std::to_string(e->x()).c_str());
-		flashcard_clicked(x);
+		if (e->buttons() == Qt::RightButton) {
+			flashcard_clicked(false);
+		}
+		else if (e->buttons() == Qt::LeftButton) {
+			flashcard_clicked(true);
+		}
 
 		return true;
 	}
@@ -88,30 +95,30 @@ void Wordsmart::show_flashcard() {
 		ui.textBrowser->setText(qs);
 	}
 	else {
-		WordInfo w = my_words.get_word_info(my_flash_card.get_word());
+		WordInfo* w = my_words.get_word_info(my_flash_card.get_word());
 
 		QString qs = "<h2 style='font-family:Verdana'> ";
-		string word = w.get_word().c_str();
+		string word = w->get_word().c_str();
 		word[0] = toupper(word[0]);
 		qs += word.c_str();
 		qs += "</h2><span> ";
 
-		for (int i = 0; i < w.num_def(); i++) {
+		for (int i = 0; i < w->num_def(); i++) {
 			qs += std::to_string(i + 1).c_str();
 			qs += ". ";
-			qs += QString::fromWCharArray(w.get_kr_definition(i).c_str());
+			qs += QString::fromWCharArray(w->get_kr_definition(i).c_str());
 			qs += " ";
 		}
 		qs += "</span><ul>";
 
-		for (int i = 0; i < w.num_en_def(); i++) {
-			qs += QString::fromWCharArray(w.get_en_definition(i).c_str());
+		for (int i = 0; i < w->num_en_def(); i++) {
+			qs += QString::fromWCharArray(w->get_en_definition(i).c_str());
 		}
 		qs += "</ul>";
 		ui.textBrowser->setText(qs);
 	}
 }
-void Wordsmart::flashcard_clicked(int x) {
+void Wordsmart::flashcard_clicked(bool does_user_know) {
 	if (my_flash_card.is_flashcard_empty()) {
 		show_flashcard();
 		return;
@@ -121,20 +128,26 @@ void Wordsmart::flashcard_clicked(int x) {
 
 	if (my_flash_card.is_showing_word()) {
 		// User memorized the word
-		if (x > ui.textBrowser->size().width() / 2) {
+		if (does_user_know) {
 			my_flash_card.user_memorized();
 		}
 		else {
 			my_flash_card.user_forgot();
 		}
-
+		ui.statusBar->showMessage("");
 		my_flash_card.next_word();
+	}
+	else {
+		ui.statusBar->showMessage("Left click - I know this word / Right click - I don't know this word");
 	}
 	show_flashcard();
 }
 void Wordsmart::clipboard_changed()
 {
+	//ui.textBrowser->setText("event happened");
 	ui.textBrowser->setText(clipboard->text());
+	if (clipboard->text().length() >= 30) return;
+
 	my_words.register_word(clipboard->text().toStdString());
 	connect(&my_words, &Words::defFound, this, &Wordsmart::word_is_found);
 }
@@ -203,24 +216,24 @@ void Wordsmart::word_is_found(const WordInfo& w)
 void Wordsmart::list_word_clicked(QListWidgetItem *item)
 {
 	current_selected_word = item->text().toStdString();
-	WordInfo& w = my_words.get_word_info(current_selected_word);
+	WordInfo* w = my_words.get_word_info(current_selected_word);
 
 	QString qs = "<h2> ";
-	string word = w.get_word().c_str();
+	string word = w->get_word().c_str();
 	word[0] = toupper(word[0]);
 	qs += word.c_str();
 	qs += "</h2><span> ";
 
-	for (int i = 0; i < w.num_def(); i++) {
+	for (int i = 0; i < w->num_def(); i++) {
 		qs += std::to_string(i + 1).c_str();
 		qs += ". ";
-		qs += QString::fromWCharArray(w.get_kr_definition(i).c_str());
+		qs += QString::fromWCharArray(w->get_kr_definition(i).c_str());
 		qs += " ";
 	}
 	qs += "</span><ul>";
 
-	for (int i = 0; i < w.num_en_def(); i++) {
-		qs += QString::fromWCharArray(w.get_en_definition(i).c_str());
+	for (int i = 0; i < w->num_en_def(); i++) {
+		qs += QString::fromWCharArray(w->get_en_definition(i).c_str());
 	}
 	qs += "</ul>";
 	ui.textBrowser_2->setText(qs);

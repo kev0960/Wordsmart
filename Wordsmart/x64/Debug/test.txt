@@ -1,0 +1,81 @@
+<  >
+ < wordlist >
+ { <word word="associated"><kr_def>???</kr_def><kr_def>??? ??</kr_def><kr_def>????</kr_def><kr_def>???</kr_def><kr_def>???</kr_def><en_def><li style='margin-top:10px'><span style='color:blue'> (v) </span>make a logical or causal connection<br/><span style='color:gray;padding-left:15px'> associate, tie in, relate, link, colligate, link up, connect</span><ul style='margin-top:15px'><li>I cannot connect these two pieces of evidence in my mind</li><li>colligate these facts</li></ul></li></en_def><en_def><li style='margin-top:10px'><span style='color:blue'> (v) </span>keep company with; hang out with<br/><span style='color:gray;padding-left:15px'> consort, associate, affiliate, assort</span><ul style='margin-top:15px'><li>He associates with strange people</li></ul></li></en_def><en_def><li style='margin-top:10px'><span style='color:blue'> (v) </span>bring or come into association or action<br/><span style='color:gray;padding-left:15px'> consociate, associate</span></li></en_def></word><word word="download"><kr_def>????</kr_def><kr_def>??????</kr_def><kr_def>????</kr_def><en_def><li style='margin-top:10px'><span style='color:blue'> (v) </span>transfer a file or program from a central computer to a smaller computer or to a computer at a remote location</li></en_def></word> }
+  < word >
+  { <kr_def>???</kr_def><kr_def>??? ??</kr_def><kr_def>????</kr_def><kr_def>???</kr_def><kr_def>???</kr_def><en_def><li style='margin-top:10px'><span style='color:blue'> (v) </span>make a logical or causal connection<br/><span style='color:gray;padding-left:15px'> associate, tie in, relate, link, colligate, link up, connect</span><ul style='margin-top:15px'><li>I cannot connect these two pieces of evidence in my mind</li><li>colligate these facts</li></ul></li></en_def><en_def><li style='margin-top:10px'><span style='color:blue'> (v) </span>keep company with; hang out with<br/><span style='color:gray;padding-left:15px'> consort, associate, affiliate, assort</span><ul style='margin-top:15px'><li>He associates with strange people</li></ul></li></en_def><en_def><li style='margin-top:10px'><span style='color:blue'> (v) </span>bring or come into association or action<br/><span style='color:gray;padding-left:15px'> consociate, associate</span></li></en_def> }
+  [ word ] associated
+   < kr_def >
+   { ??? }
+   < kr_def >
+   { ??? ?? }
+   < kr_def >
+   { ???? }
+   < kr_def >
+   { ??? }
+   < kr_def >
+   { ??? }
+   < en_def >
+   { <li style='margin-top:10px'><span style='color:blue'> (v) </span>make a logical or causal connection<br/><span style='color:gray;padding-left:15px'> associate, tie in, relate, link, colligate, link up, connect</span><ul style='margin-top:15px'><li>I cannot connect these two pieces of evidence in my mind</li><li>colligate these facts</li></ul></li> }
+    < li >
+    { <span style='color:blue'> (v) </span>make a logical or causal connection<br/><span style='color:gray;padding-left:15px'> associate, tie in, relate, link, colligate, link up, connect</span><ul style='margin-top:15px'><li>I cannot connect these two pieces of evidence in my mind</li><li>colligate these facts</li></ul> }
+    [ style ] margin-top:10px
+     < span >
+     {  (v)  }
+     [ style ] color:blue
+     < br/ >
+     < span >
+     {  associate, tie in, relate, link, colligate, link up, connect }
+     [ style ] color:gray;padding-left:15px
+     < ul >
+     { <li>I cannot connect these two pieces of evidence in my mind</li><li>colligate these facts</li> }
+     [ style ] margin-top:15px
+      < li >
+      { I cannot connect these two pieces of evidence in my mind }
+      < li >
+      { colligate these facts }
+   < en_def >
+   { <li style='margin-top:10px'><span style='color:blue'> (v) </span>keep company with; hang out with<br/><span style='color:gray;padding-left:15px'> consort, associate, affiliate, assort</span><ul style='margin-top:15px'><li>He associates with strange people</li></ul></li> }
+    < li >
+    { <span style='color:blue'> (v) </span>keep company with; hang out with<br/><span style='color:gray;padding-left:15px'> consort, associate, affiliate, assort</span><ul style='margin-top:15px'><li>He associates with strange people</li></ul> }
+    [ style ] margin-top:10px
+     < span >
+     {  (v)  }
+     [ style ] color:blue
+     < br/ >
+     < span >
+     {  consort, associate, affiliate, assort }
+     [ style ] color:gray;padding-left:15px
+     < ul >
+     { <li>He associates with strange people</li> }
+     [ style ] margin-top:15px
+      < li >
+      { He associates with strange people }
+   < en_def >
+   { <li style='margin-top:10px'><span style='color:blue'> (v) </span>bring or come into association or action<br/><span style='color:gray;padding-left:15px'> consociate, associate</span></li> }
+    < li >
+    { <span style='color:blue'> (v) </span>bring or come into association or action<br/><span style='color:gray;padding-left:15px'> consociate, associate</span> }
+    [ style ] margin-top:10px
+     < span >
+     {  (v)  }
+     [ style ] color:blue
+     < br/ >
+     < span >
+     {  consociate, associate }
+     [ style ] color:gray;padding-left:15px
+  < word >
+  { <kr_def>????</kr_def><kr_def>??????</kr_def><kr_def>????</kr_def><en_def><li style='margin-top:10px'><span style='color:blue'> (v) </span>transfer a file or program from a central computer to a smaller computer or to a computer at a remote location</li></en_def> }
+  [ word ] download
+   < kr_def >
+   { ???? }
+   < kr_def >
+   { ?????? }
+   < kr_def >
+   { ???? }
+   < en_def >
+   { <li style='margin-top:10px'><span style='color:blue'> (v) </span>transfer a file or program from a central computer to a smaller computer or to a computer at a remote location</li> }
+    < li >
+    { <span style='color:blue'> (v) </span>transfer a file or program from a central computer to a smaller computer or to a computer at a remote location }
+    [ style ] margin-top:10px
+     < span >
+     {  (v)  }
+     [ style ] color:blue

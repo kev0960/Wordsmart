@@ -1,13 +1,19 @@
 <  >
  < li >
- { <a href="webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=embedded&amp;i=3&amp;h=0000#c">S:</a><a class="pos"> (adj) </a><b>embedded</b> (inserted as an integral part of a surrounding whole) <i>"confused by the embedded Latin quotations"; "an embedded subordinate clause"</i> }
+ { <a href="webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=analysis&amp;i=5&amp;h=000000#c">S:</a><a class="pos"> (n) </a><a href="webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=psychoanalysis">psychoanalysis</a>, <b>analysis</b>, <a href="webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=depth+psychology">depth psychology</a> (a set of techniques for exploring underlying motives and a method of treating various mental disorders; based on the theories of Sigmund Freud) <i>"his physician recommended psychoanalysis"</i> }
   < a >
   { S: }
-  [ href ] webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=embedded&amp;i=3&amp;h=0000#c
+  [ href ] webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=analysis&amp;i=5&amp;h=000000#c
   < a >
-  {  (adj)  }
+  {  (n)  }
   [ class ] pos
+  < a >
+  { psychoanalysis }
+  [ href ] webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=psychoanalysis
   < b >
-  { embedded }
+  { analysis }
+  < a >
+  { depth psychology }
+  [ href ] webwn?o2=&amp;o0=1&amp;o8=1&amp;o1=1&amp;o7=&amp;o5=&amp;o9=&amp;o6=&amp;o3=&amp;o4=&amp;s=depth+psychology
   < i >
-  { "confused by the embedded Latin quotations"; "an embedded subordinate clause" }
+  { "his physician recommended psychoanalysis" }

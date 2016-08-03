@@ -98,7 +98,7 @@ private:
 	// Flash cards
 	FlashCard my_flash_card;
 	void flash_cards();
-	void flashcard_clicked(int x);
+	void flashcard_clicked(bool does_user_know);
 	void show_flashcard();
 
 	// Show Word List

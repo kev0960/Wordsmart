@@ -183,7 +183,7 @@ public:
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana';\"><br /></p></body></html>", 0));
         groupBox->setTitle(QApplication::translate("WordsmartClass", "GroupBox", 0));
         pushButton_2->setText(QApplication::translate("WordsmartClass", "Delete Word", 0));
-        pushButton->setText(QApplication::translate("WordsmartClass", "PushButton", 0));
+        pushButton->setText(QApplication::translate("WordsmartClass", "Save List to Excel File", 0));
         menuWho->setTitle(QApplication::translate("WordsmartClass", "Help", 0));
         menu->setTitle(QApplication::translate("WordsmartClass", "Learn Words", 0));
     } // retranslateUi

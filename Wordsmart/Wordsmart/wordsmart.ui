@@ -87,7 +87,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QPushButton" name="pushButton">
              <property name="text">
-              <string>PushButton</string>
+              <string>Save List to Excel File</string>
              </property>
             </widget>
            </item>

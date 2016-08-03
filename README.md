@@ -1,2 +1,2 @@
 # Wordsmart
-Smark Vocab Learning Tool
+Smart Vocab Learning Tool
