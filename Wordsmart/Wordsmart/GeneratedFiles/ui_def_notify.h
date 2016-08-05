@@ -15,7 +15,6 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QTextBrowser>
 
 QT_BEGIN_NAMESPACE
@@ -23,7 +22,6 @@ QT_BEGIN_NAMESPACE
 class Ui_Dialog
 {
 public:
-    QPushButton *pushButton;
     QTextBrowser *textBrowser;
 
     void setupUi(QDialog *Dialog)
@@ -36,17 +34,9 @@ public:
         Dialog->setStyleSheet(QLatin1String("#Dialog {\n"
 "background-color: white;\n"
 "}"));
-        pushButton = new QPushButton(Dialog);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(419, 0, 31, 28));
-        pushButton->setFocusPolicy(Qt::NoFocus);
-        pushButton->setStyleSheet(QLatin1String("#pushButton {\n"
-"background-color:white;\n"
-"border:none;\n"
-"}"));
         textBrowser = new QTextBrowser(Dialog);
         textBrowser->setObjectName(QStringLiteral("textBrowser"));
-        textBrowser->setGeometry(QRect(2, 2, 411, 141));
+        textBrowser->setGeometry(QRect(2, 2, 451, 141));
         QFont font;
         font.setFamily(QStringLiteral("Verdana"));
         font.setPointSize(10);
@@ -54,8 +44,6 @@ public:
         textBrowser->setStyleSheet(QLatin1String("#textBrowser {\n"
 "border: none;\n"
 "}"));
-        textBrowser->raise();
-        pushButton->raise();
 
         retranslateUi(Dialog);
 
@@ -64,7 +52,6 @@ public:
 
     void retranslateUi(QDialog *Dialog)
     {
-        pushButton->setText(QApplication::translate("Dialog", "x", 0));
         textBrowser->setHtml(QApplication::translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

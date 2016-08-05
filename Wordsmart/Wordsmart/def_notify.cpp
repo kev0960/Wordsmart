@@ -12,23 +12,30 @@ Notify::Notify(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 		Qt::WindowStaysOnTopHint // Always on top
 	);
 
-	connect(ui->pushButton, &QPushButton::clicked, this, &Notify::close_notify);
+	ui->textBrowser->viewport()->installEventFilter(this);
+	setWindowOpacity(0.8);
 }
-
+void Notify::timerEvent(QTimerEvent* event) 
+{
+	if (timer_id == event->timerId()) {
+		close_notify();
+	}
+}
+bool Notify::eventFilter(QObject* target, QEvent* event) 
+{
+	if (target == ui->textBrowser->viewport() && event->type() == QEvent::MouseButtonPress) {
+		close_notify();
+		return true;
+	}
+	return QWidget::eventFilter(target, event);
+}
 Notify::~Notify() {
 	delete ui;
 }
 
 void Notify::show_notification(const WordInfo& w)
 {
-	/*
-	if (timer) {
-		timer->stop();
-		delete timer;
-
-		timer = new QTimer(this);
-
-	}*/
+	timer_id = startTimer(1000 * 8);
 
 	QString qs = "<h2 style='font-family:Verdana'> ";
 	string word = w.get_word().c_str();

@@ -17,11 +17,6 @@ Wordsmart::Wordsmart(QWidget *parent)
 
 	ui.textBrowser->viewport()->installEventFilter(this);
 	
-	string f = "Test";
-	vector<wstring> a = { L"no" };
-	vector<wstring> b = { L"no" };
-	WordInfo x(f, a, b );
-	my_words.registered_words["hey"] = (WordInfo*)&x;
 	notification = new Notify;
 }
 bool Wordsmart::load_saved_wordlist()

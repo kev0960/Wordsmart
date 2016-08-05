@@ -22,6 +22,8 @@ signals:
 
 private:
 	Ui::Dialog *ui;
-	QTimer* timer;
+	int timer_id;
 
+	void timerEvent(QTimerEvent* event);
+	bool eventFilter(QObject* target, QEvent* event);
 };

@@ -1,9 +1,10 @@
-﻿  moc_def_notify.cpp
+﻿  Moc'ing words.h...
+  moc_def_notify.cpp
   moc_words.cpp
   moc_wordsmart.cpp
   def_notify.cpp
   wordsmart.cpp
   Generating Code...
   main.cpp
-  Wordsmart.vcxproj -> C:\Users\JaebumLee\Source\Repos\Wordsmart\Wordsmart\x64\Debug\Wordsmart.exe
-  Wordsmart.vcxproj -> C:\Users\JaebumLee\Source\Repos\Wordsmart\Wordsmart\x64\Debug\Wordsmart.pdb (Full PDB)
+  Wordsmart.vcxproj -> C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\x64\Debug\Wordsmart.exe
+  Wordsmart.vcxproj -> C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\x64\Debug\Wordsmart.pdb (Full PDB)

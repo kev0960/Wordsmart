@@ -20,6 +20,63 @@ using std::string;
 using std::wstring;
 using std::vector;
 
+template <typename T>
+inline T max(T a, T b)
+{
+	return a < b ? b : a;
+}
+
+class Memorize {
+	vector<time_t> memorized;
+	vector<int> score;
+
+public:
+	Memorize() {}
+
+	void set_memorization(int sc) {
+		memorized.push_back(time(0));
+		score.push_back(sc);
+	}
+
+	// If user have successfully memorized for the last 3 cases,
+	// the user confirms to have fully memorized (and don't show)
+	
+	// Even if the user passes the last 3 cases, we should check whether
+	// the date difference is more than 1 week. If more than 1 week has passed,
+	// we should present word in a flashcard. 
+	
+	// Finally, if the user has managed to pass last 3 checks for 3 weeks, 
+	// the word will be registered as a permanent memorization.
+	bool present_word() {
+		// Check from the back
+		int cnt = 0;
+		for (int i = score.size() - 1; i >= max(0, static_cast<int>(score.size()) - 3); i--) {
+			if (score[i] == 3) cnt++;
+		}
+
+		if (cnt != 3) return true;
+
+		int i = score.size() - 1;
+		while (i >= 0) {
+			if (score[i] != 3) break;
+			i--;
+		}
+		if (i < 0) i= 0;
+
+		if (memorized[i] <= time(0) - 60 * 60 * 24 * 7 * 3) {
+			return false;
+		}
+		return true;
+	}
+	string last_visited() {
+		if (!score.size()) return "";
+		struct tm* time_info = localtime(&memorized.back());
+
+		char buf[80];
+		strftime(buf, 80, "%Y-%m-%d", time_info);
+		return buf;
+	}
+};
 class WordInfo : public QObject {
 	Q_OBJECT
 
@@ -54,6 +111,8 @@ class WordInfo : public QObject {
 		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 		return converter.from_bytes(s);
 	}
+
+	Memorize mem;
 
 signals:
 	// Signal when the definition of the word is fully fetched and parsed
@@ -257,7 +316,7 @@ public:
 			for (; itr != parser.DOM().end(); ++itr) {
 				if (itr->tag == L"a") {
 					if (num_syn == 0) {
-						html_def += L"<br/><span style='color:gray;padding-left:15px'>";
+						html_def += L"<br/><span style='color:red;padding-left:15px'>";
 					}
 					if (num_syn > 0) html_def += L",";
 
@@ -353,12 +412,10 @@ public:
 	}
 };
 
-
-
 class Words : public QObject {
 	Q_OBJECT
 
-public:
+private:
 	map<string, WordInfo*> registered_words;
 
 	// Found word 
