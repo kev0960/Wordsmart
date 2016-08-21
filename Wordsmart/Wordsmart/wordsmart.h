@@ -6,76 +6,6 @@
 #include "words.h"
 #include "def_notify.h"
 
-class FlashCard
-{
-	vector<string> word_list;
-	vector<int> memorized;
-
-	int current_word;
-	bool flashcard_showing_word;
-
-public:
-	FlashCard():  flashcard_showing_word(true), current_word(0) {
-
-	}
-
-	void set_word_list(std::set<string>& new_word_list) {
-		word_list.resize(new_word_list.size());
-
-		int i = 0;
-		for (std::set<string>::iterator itr = new_word_list.begin(); itr != new_word_list.end(); itr++, i ++) {
-			word_list[i] = *itr;
-		}
-
-		memorized.resize(word_list.size(), 0);
-		for (i = 0; i < memorized.size(); i++) {
-			memorized[i] = 0;
-		}
-	}
-
-	void flip() {
-		flashcard_showing_word = !flashcard_showing_word;
-	}
-
-	void user_memorized() {
-		memorized[current_word] ++ ;
-
-		if (memorized[current_word] > 3) {
-			memorized[current_word] = 3;
-		}
-	}
-	void user_forgot() {
-		memorized[current_word] = 0;
-	}
-
-	int memorize_count() {
-		return memorized[current_word];
-	}
-
-	// When it goes to the last word, it comes back to the first one
-	bool next_word() {
-		if (current_word >= word_list.size() - 1) {
-			current_word = 0;
-			return false;
-		}
-		else {
-			current_word++;
-		}
-		return true;
-	}
-
-	string get_word() {
-		return word_list[current_word];
-	}
-
-	bool is_showing_word() {
-		return flashcard_showing_word;
-	}
-
-	bool is_flashcard_empty() {
-		return word_list.empty();
-	}
-};
 class Wordsmart : public QMainWindow
 {
 	Q_OBJECT
@@ -96,7 +26,6 @@ private:
 	void show_version();
 
 	// Flash cards
-	FlashCard my_flash_card;
 	void flash_cards();
 	void flashcard_clicked(bool does_user_know);
 	void show_flashcard();
@@ -107,10 +36,12 @@ private:
 	void delete_word();
 
 	void word_is_found(const WordInfo& w);
-	void list_word_clicked(QListWidgetItem *item);
+	void word_clicked(QListWidgetItem *item);
 
+	void word_list_clicked(QListWidgetItem* item);
 	QClipboard* clipboard;
 
+	WordListManager word_list_manager;
 	Words my_words;
 	string current_selected_word;
 

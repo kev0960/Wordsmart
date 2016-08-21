@@ -11,6 +11,7 @@ using std::map;
 using std::vector;
 
 namespace Parser {
+	class DOMTree;
 
 	struct HTMLElement
 	{
@@ -18,28 +19,34 @@ namespace Parser {
 		map<wstring, wstring> attr;
 		wstring inner_text;
 
-		wstring inner_html;
+		wstring _inner_html;
 		size_t tag_start;
+		size_t tag_end;
 
 		HTMLElement* parent;
 		vector<HTMLElement*> children;
 
-		HTMLElement() {
+		DOMTree* dom;
+
+		HTMLElement(DOMTree* dom) : dom(dom) {
 
 		}
-		HTMLElement(wstring& tag, map<wstring, wstring>& attr) : tag(tag), attr(attr) {
+		HTMLElement(DOMTree* dom, wstring& tag, map<wstring, wstring>& attr) : dom(dom), tag(tag), attr(attr) {
 
 		}
 
-		HTMLElement(const HTMLElement& e) : tag(e.tag), attr(e.attr) {
+		HTMLElement(const HTMLElement& e) : dom(e.dom), tag(e.tag), attr(e.attr) {
 
 		}
+
+		inline wstring inner_html();
 	};
 
 	class DOMTree
 	{
 		HTMLElement* top;
 		HTMLElement* cursor;
+		wstring html;
 
 		bool delete_element(HTMLElement* e) {
 			for (int i = 0; i < e->children.size(); i++) {
@@ -110,9 +117,14 @@ namespace Parser {
 		DOMTree() {
 			// Top level DOM Element (has no data)
 			// Only to specify the top-most level
-			top = new HTMLElement();
+			top = new HTMLElement(this);
 			cursor = top;
 		}
+
+		void set_html(wstring& h) {
+			html = h;
+		}
+
 		bool level_up() {
 			if (cursor == top) return false;
 
@@ -142,7 +154,7 @@ namespace Parser {
 			cursor->tag_start = start;
 		}
 		void set_inner_html(wstring& s, size_t end) {
-			cursor->inner_html = s.substr(cursor->tag_start, end - cursor->tag_start + 1);
+			cursor->tag_end = end;
 		}
 
 		iterator begin() {
@@ -155,10 +167,20 @@ namespace Parser {
 			return iterator(top, *this);
 		}
 
-		~DOMTree() {
+		wstring& get_html() {
+			return html;
+		}
 
+		~DOMTree() {
 		}
 	};
+
+	inline wstring HTMLElement::inner_html() {
+		if (!_inner_html.size()) {
+			_inner_html = dom->get_html().substr(tag_start, tag_end - tag_start + 1);
+		}
+		return _inner_html;
+	}
 
 	class HTMLParser
 	{
@@ -179,6 +201,7 @@ namespace Parser {
 	public:
 		HTMLParser(wstring html_str) : html(html_str) {
 			strip_whitespace(html);
+			dom_tree.set_html(html);
 
 			wstring open_bracket = L"<";
 			wstring closing_bracket = L">";
@@ -244,10 +267,10 @@ namespace Parser {
 
 			// If it is a closing tag
 			if (split[0][0] == L'/') {
-				return HTMLElement();
+				return HTMLElement(&dom_tree);
 			}
 			else if (split[0] == L"!--") {
-				return HTMLElement(split[0], attr);
+				return HTMLElement(&dom_tree, split[0], attr);
 			}
 
 			wstring tag_name = L"";
@@ -388,7 +411,7 @@ namespace Parser {
 
 			}
 
-			return HTMLElement(tag_name, attr);
+			return HTMLElement(&dom_tree, tag_name, attr);
 		}
 		DOMTree& DOM() { return dom_tree;  }
 

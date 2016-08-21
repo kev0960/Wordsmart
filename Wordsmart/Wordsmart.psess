@@ -36,7 +36,7 @@
   </PostinstrumentEvent>
   <Binaries>
     <ProjBinary>
-      <Path>x64\Debug\Wordsmart.exe</Path>
+      <Path>x64\Release\Wordsmart.exe</Path>
       <ArgumentTimestamp>01/01/0001 00:00:00</ArgumentTimestamp>
       <Instrument>true</Instrument>
       <Sample>true</Sample>
@@ -48,7 +48,7 @@
       <LaunchProject>true</LaunchProject>
       <OverrideProjectSettings>false</OverrideProjectSettings>
       <LaunchMethod>Executable</LaunchMethod>
-      <ExecutablePath>x64\Debug\Wordsmart.exe</ExecutablePath>
+      <ExecutablePath>x64\Release\Wordsmart.exe</ExecutablePath>
       <StartupDirectory>Wordsmart\</StartupDirectory>
       <Arguments>
       </Arguments>
@@ -67,11 +67,6 @@
       <ProjName>Wordsmart</ProjName>
     </ProjBinary>
   </Binaries>
-  <Reports>
-    <Report>
-      <Path>Wordsmart160803.vspx</Path>
-    </Report>
-  </Reports>
   <Launches>
     <ProjBinary>
       <Path>:PB:{B12702AD-ABFB-343A-A199-8E24837244A3}|Wordsmart\Wordsmart.vcxproj</Path>

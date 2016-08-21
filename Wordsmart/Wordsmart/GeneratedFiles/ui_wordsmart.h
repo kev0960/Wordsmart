@@ -44,6 +44,7 @@ public:
     QTextBrowser *textBrowser;
     QWidget *page_2;
     QHBoxLayout *horizontalLayout;
+    QListWidget *listWidget_2;
     QListWidget *listWidget;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_3;
@@ -61,7 +62,7 @@ public:
     {
         if (WordsmartClass->objectName().isEmpty())
             WordsmartClass->setObjectName(QStringLiteral("WordsmartClass"));
-        WordsmartClass->resize(600, 400);
+        WordsmartClass->resize(869, 511);
         actionVersion = new QAction(WordsmartClass);
         actionVersion->setObjectName(QStringLiteral("actionVersion"));
         actionFlash_Cards = new QAction(WordsmartClass);
@@ -99,6 +100,11 @@ public:
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        listWidget_2 = new QListWidget(page_2);
+        listWidget_2->setObjectName(QStringLiteral("listWidget_2"));
+
+        horizontalLayout->addWidget(listWidget_2);
+
         listWidget = new QListWidget(page_2);
         listWidget->setObjectName(QStringLiteral("listWidget"));
         listWidget->setMaximumSize(QSize(400, 16777215));
@@ -143,7 +149,7 @@ public:
         WordsmartClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(WordsmartClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 600, 26));
+        menuBar->setGeometry(QRect(0, 0, 869, 26));
         menuWho = new QMenu(menuBar);
         menuWho->setObjectName(QStringLiteral("menuWho"));
         menu = new QMenu(menuBar);

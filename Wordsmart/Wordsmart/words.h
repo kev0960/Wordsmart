@@ -26,12 +26,31 @@ inline T max(T a, T b)
 	return a < b ? b : a;
 }
 
+namespace Util {
+	inline string wstr_to_str(wstring ws) {
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		return converter.to_bytes(ws);
+	}
+	inline wstring str_to_wstr(string s) {
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		return converter.from_bytes(s);
+	}
+	inline long long wstr_to_long_long(wstring s) {
+		std::wstringstream ws(s); 
+		long long x; ws >> x; return x;
+	}
+}
+
 class Memorize {
 	vector<time_t> memorized;
 	vector<int> score;
 
 public:
 	Memorize() {}
+	Memorize(vector<time_t>& m, vector<int>& s) : memorized(m), score(s) {
+
+	}
+	Memorize(const Memorize& m) : memorized(m.memorized), score(m.score) {}
 
 	void set_memorization(int sc) {
 		memorized.push_back(time(0));
@@ -54,11 +73,11 @@ public:
 			if (score[i] == 3) cnt++;
 		}
 
-		if (cnt != 3) return true;
+		if (cnt < 3) return true;
 
 		int i = score.size() - 1;
 		while (i >= 0) {
-			if (score[i] != 3) break;
+			if (score[i] < 3) break;
 			i--;
 		}
 		if (i < 0) i= 0;
@@ -75,6 +94,288 @@ public:
 		char buf[80];
 		strftime(buf, 80, "%Y-%m-%d", time_info);
 		return buf;
+	}
+
+	void add_memory(time_t mem, int sc) {
+		memorized.push_back(mem);
+		score.push_back(sc);
+	}
+
+	wstring stringify() {
+		wstring s;
+		for (int i = 0; i < memorized.size(); i++) {
+			s += L"<mem time=\"";
+			s += std::to_wstring(static_cast<unsigned long long>(memorized[i]));
+			s += L"\" score=\"";
+			s += std::to_wstring(static_cast<unsigned long long>(score[i]));
+			s += L"\"></mem>";
+		}
+		return s;
+	}
+
+	void add_score(int sc) {
+		if (!memorized.size()) {
+			memorized.push_back(time(0));
+			score.push_back(sc);
+			return;
+		}
+
+		time_t now = time(0);
+
+		// If the difference between last visit is less than 12 hours,
+		// we consider that the user is continuing his flashcard practice
+		if (now - memorized.back() < 12 * 3600) {
+			score.back() += sc;
+		}
+		else {
+			memorized.push_back(time(0));
+			score.push_back(sc);
+		}
+	}
+
+	bool user_forget() {
+		if (!memorized.size()) {
+			return false;
+		}
+
+		score.back() = 0;
+		return true;
+	}
+
+	int current_score() {
+		if (!memorized.size()) {
+			return 0;
+		}
+
+		time_t now = time(0);
+
+		// If the difference between last visit is less than 12 hours,
+		// we consider that the user is continuing his flashcard practice
+		if (now - memorized.back() < 12 * 3600) {
+			return score.back();
+		}
+		else {
+			return 0;
+		}
+	}
+};
+
+class WordList {
+	vector<std::pair<string, Memorize>> words;
+	wstring name;
+
+	int current_word;
+	bool flashcard_showing_word; 
+
+public:
+	WordList(wstring name) 
+		: name(name), flashcard_showing_word(true), current_word(0) {
+
+	}
+	WordList(const WordList& w) 
+		: words(w.words), name(w.name), current_word(w.current_word),
+		flashcard_showing_word(w.flashcard_showing_word) {
+
+	}
+
+	vector<std::pair<string, Memorize>> get_words() {
+		return words;
+	}
+
+	bool add_word(string s) {
+		for (int i = 0; i < words.size(); i++) {
+			if (words[i].first == s) return false; 
+		}
+		words.push_back(std::make_pair(s, Memorize()));
+
+		return true;
+	}
+
+	bool add_word(string s, Memorize& mem) {
+		for (int i = 0; i < words.size(); i++) {
+			if (words[i].first == s) return false;
+		}
+		words.push_back(std::make_pair(s, mem));
+
+		return true;
+	}
+
+	bool delete_word(string word) {
+		for (int i = 0; i < words.size(); i++) {
+			if (words[i].first == word) {
+				words.erase(words.begin() + i);
+				return true;
+			}
+		}
+		return false; 
+	}
+	bool set_memorization(string word, int sc)
+	{
+		for (int i = 0; i < words.size(); i++) {
+			if (words[i].first == word) {
+				words[i].second.set_memorization(sc);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool merge(WordList& w) {
+		for (int i = 0; i < w.words.size(); i++) {
+			bool duplicate = false;
+			for (int j = 0; j < words.size(); j++) {
+				if (w.words[i].first == words[j].first) {
+					duplicate = true;
+					break;
+				}
+			}
+
+			if (!duplicate) {
+				add_word(w.words[i].first, w.words[i].second);
+			}
+		}
+		return true;
+	}
+
+	wstring get_name() {
+		return name;
+	}
+	
+	void set_name(wstring& n) {
+		name = n;
+	}
+
+	void flip() {
+		flashcard_showing_word = !flashcard_showing_word;
+	}
+
+	void user_memorized() {
+		words[current_word].second.add_score(1);
+	}
+	void user_forgot() {
+		words[current_word].second.user_forget();
+	}
+
+	int memorize_count() {
+		return words[current_word].second.current_score();
+	}
+
+	// When it goes to the last word, it comes back to the first one
+	bool next_word() {
+		if (current_word >= words.size() - 1) {
+			current_word = 0;
+			return false;
+		}
+		else {
+			current_word++;
+		}
+		return true;
+	}
+
+	string get_word() {
+		return words[current_word].first;
+	}
+
+	bool is_showing_word() {
+		return flashcard_showing_word;
+	}
+
+	bool is_flashcard_empty() {
+		return words.empty();
+	}
+};
+class WordListManager {
+	vector<WordList> word_lists;
+	int current_word_list;
+
+public:
+	WordListManager() : current_word_list(0) {
+
+	}
+
+	vector<WordList>& get_word_list() {
+		return word_lists;
+	}
+
+	WordList& get_current_word_list() {
+		return word_lists[current_word_list];
+	}
+
+	bool is_empty() {
+		return !word_lists.size();
+	}
+
+	// Merge word lists into one word list
+	// (It all merges into the least index word list)
+	WordList& merge_word_list(vector<int> selected) {
+		std::sort(selected.begin(), selected.end());
+
+		WordList& w = word_lists[selected[0]];
+		for (int i = selected.size() - 1; i >= 0; i --) {
+			w.merge(word_lists[selected[i]]);
+			word_lists.erase(word_lists.begin() + i);
+		}
+	}
+
+	vector<wstring> get_word_list_names() {
+		vector<wstring> list; 
+		for (int i = 0; i < word_lists.size(); i++) {
+			list.push_back(word_lists[i].get_name());
+		}
+		return list;
+	}
+	bool select_word_list(int index) {
+		if (index < word_lists.size()) {
+			current_word_list = index;
+			return true;
+		}
+		return false; 
+	}
+	// Returns true if the word is added to the previous word list
+	// Returns false if a new word list is created and the word is added to it
+	bool add_word(string word) {
+		time_t t = time(0);
+		struct tm* time_info = localtime(&t);
+
+		char buf[80];
+		strftime(buf, 80, "%Y-%m-%d", time_info);
+
+		wstring today = Util::str_to_wstr(string(buf));
+		// Today's word list
+		if (word_lists.size() && word_lists.back().get_name() == today) {
+			word_lists.back().add_word(word);
+			return true;
+		}
+		else {
+			word_lists.push_back(WordList(today));
+			word_lists.back().add_word(word);
+			return false; 
+		}
+	}
+	void add_word_list(WordList& w) {
+		word_lists.push_back(w);
+	}
+
+	void write_word_list(std::wofstream& out) {
+		for (int i = 0; i < word_lists.size(); i++) {
+			out << L"<wordlist name=\"" + word_lists[i].get_name() + L"\">";
+
+			auto words = word_lists[i].get_words();
+			for (int j = 0; j < words.size(); j++) {
+				out << L"<word word=\""
+					<< Util::str_to_wstr(words[j].first)
+					<< "\">"
+					<< words[j].second.stringify() << "</word>";
+			}
+			out << L"</wordlist>";
+		}
+	}
+
+	bool delete_current_word(string word) {
+		if (current_word_list < word_lists.size()) {
+			return word_lists[current_word_list].delete_word(word);
+		}
+		return false; 
 	}
 };
 class WordInfo : public QObject {
@@ -106,13 +407,6 @@ class WordInfo : public QObject {
 		}
 		return v;
 	}
-
-	std::wstring str_to_wstr(string& s) {
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-		return converter.from_bytes(s);
-	}
-
-	Memorize mem;
 
 signals:
 	// Signal when the definition of the word is fully fetched and parsed
@@ -232,7 +526,7 @@ public:
 				int from = found;
 				for (; itr != parser.DOM().end(); ++itr) {
 					if (itr->tag == L"span" && itr->attr[L"class"] == L"txt_search") {
-						wstring inside = itr->inner_html;
+						wstring inside = itr->inner_html();
 						// strip off tags
 						int x = inside.find(L"<");
 						int y = inside.find(L">");
@@ -400,7 +694,7 @@ public:
 	bool write_file(std::wofstream& o) {
 		if (!o) return false;
 
-		o << L"<word word=\"" << str_to_wstr(word) << L"\">";
+		o << L"<word word=\"" << Util::str_to_wstr(word) << L"\">";
 		for (int i = 0; i < kr_definition.size(); i++) {
 			o << L"<kr_def>" << kr_definition[i] << L"</kr_def>";
 		}
@@ -426,11 +720,6 @@ private:
 		for (int i = 0; i < word.size(); i++) {
 			word[i] = tolower(word[i]);
 		}
-	}
-
-	string wstr_to_str(wstring& wstr) {
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-		return converter.to_bytes(wstr);
 	}
 
 signals:
@@ -521,11 +810,11 @@ public:
 	bool write_save_file(std::wofstream& out) {
 		if (!out) return false;
 
-		out << L"<wordlist>";
+		out << L"<words>";
 		for (auto itr = found_words.begin(); itr != found_words.end(); itr++) {
 			registered_words[*itr]->write_file(out);
 		}
-		out << L"</wordlist>";
+		out << L"</words>";
 
 		return true;
 	}
@@ -537,7 +826,7 @@ public:
 		}
 		return false;
 	}
-	bool read_save_file(std::wifstream& in) {
+	bool read_save_file(std::wifstream& in, WordListManager& word_list_manager) {
 		if (!in) return false;
 
 		wstring file_data; 
@@ -557,7 +846,7 @@ public:
 			if (itr->tag == L"word") {
 				if (current_word.size()) {
 					// Register the previous current_word
-					string s_word = wstr_to_str(current_word);
+					string s_word = Util::wstr_to_str(current_word);
 					found_words.insert(s_word);
 
 					registered_words[s_word] = new WordInfo(s_word, kr_definition, en_definition);
@@ -568,21 +857,74 @@ public:
 				current_word = itr->attr[L"word"];
 			}
 			else if (itr->tag == L"kr_def") {
-				kr_definition.push_back(itr->inner_html);
+				kr_definition.push_back(itr->inner_html());
 			}
 			else if (itr->tag == L"en_def") {
-				en_definition.push_back(itr->inner_html);
+				en_definition.push_back(itr->inner_html());
+			}
+			else if (itr->tag == L"wordlist") {
+				break;
 			}
 		}
 
 		if (current_word.size()) {
 			// Register the previous current_word
-			string s_word = wstr_to_str(current_word);
+			string s_word = Util::wstr_to_str(current_word);
 			found_words.insert(s_word);
 			registered_words[s_word] = new WordInfo(s_word, kr_definition, en_definition);
 		}
-		
 
+		// Now read the word list
+		wstring word_list_name;
+		wstring word;
+
+		WordList word_list(L"");
+		Memorize m;
+
+		for (; itr != parser.DOM().end(); ++itr) {
+			if (itr->tag == L"wordlist") {
+				if (word_list_name != L"") {
+					if (word != L"") {
+						word_list.add_word(Util::wstr_to_str(word), m);
+					}
+					word_list_manager.add_word_list(word_list);
+
+					// Clear 
+					word_list = WordList(L"");
+					m = Memorize();
+					word = L"";
+				}
+				word_list_name = itr->attr[L"name"];
+				word_list.set_name(word_list_name);
+			}
+			else if (itr->tag == L"word") {
+				// Add the previous mem and score to the word list
+				if (word != L"") {
+					word_list.add_word(Util::wstr_to_str(word), m);
+				}
+
+				word = itr->attr[L"word"];
+				m = Memorize();
+			}
+			else if (itr->tag == L"mem") {
+				m.add_memory(
+					Util::wstr_to_long_long(itr->attr[L"time"]),
+					Util::wstr_to_long_long(itr->attr[L"score"])
+				);
+			}
+		}
+		
+		if (word_list_name != L"") {
+			if (word != L"") {
+				word_list.add_word(Util::wstr_to_str(word), m);
+			}
+			word_list_manager.add_word_list(word_list);
+
+			// Clear 
+			word_list = WordList(L"");
+			m = Memorize();
+			word = L"";
+		}
 		return true;
 	}
 

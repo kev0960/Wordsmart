@@ -12,7 +12,8 @@ Wordsmart::Wordsmart(QWidget *parent)
 	connect(clipboard, &QClipboard::changed, this, &Wordsmart::clipboard_changed);
 	create_action();
 
-	connect(ui.listWidget, &QListWidget::itemPressed, this, &Wordsmart::list_word_clicked);
+	connect(ui.listWidget, &QListWidget::itemPressed, this, &Wordsmart::word_clicked);
+	connect(ui.listWidget_2, &QListWidget::itemPressed, this, &Wordsmart::word_list_clicked);
 	connect(ui.pushButton_2, &QPushButton::clicked, this, &Wordsmart::delete_word);
 
 	ui.textBrowser->viewport()->installEventFilter(this);
@@ -26,8 +27,7 @@ bool Wordsmart::load_saved_wordlist()
 	in.imbue(loc);
 
 	bool result = false;
-	result = my_words.read_save_file(in);
-	if(result) my_flash_card.set_word_list(my_words.get_word_list()); 
+	result = my_words.read_save_file(in, word_list_manager);
 
 	fetch_word_list();
 	return result;
@@ -48,7 +48,7 @@ bool Wordsmart::eventFilter(QObject* target, QEvent* event) {
 	return QWidget::eventFilter(target, event);
 }
 void Wordsmart::show_flashcard() {
-	if (my_flash_card.is_flashcard_empty()) {
+	if(word_list_manager.is_empty()) {
 		string top_margin = std::to_string(ui.textBrowser->size().height() / 2 - 85);
 		QString qs = "<br><p align=\"center\" style=\"font-size:50px;margin-top:";
 		qs += top_margin.c_str();
@@ -58,10 +58,12 @@ void Wordsmart::show_flashcard() {
 		return;
 	}
 
-	if (my_flash_card.is_showing_word()) {
+	WordList& current_word_list = word_list_manager.get_current_word_list();
+
+	if (current_word_list.is_showing_word()) {
 		QString qs = "<div align=\"right\" style=\"font-size:small;vertical-align:top;";
 
-		switch (my_flash_card.memorize_count()) {
+		switch (current_word_list.memorize_count()) {
 		case 0:
 		case 1:
 			qs += "color:red;\">";
@@ -69,7 +71,7 @@ void Wordsmart::show_flashcard() {
 		case 2:
 			qs += "color:yellow;\">";
 			break;
-		case 3:
+		default :
 			qs += "color:green;\">";
 			break;
 		}
@@ -81,7 +83,7 @@ void Wordsmart::show_flashcard() {
 		qs += top_margin.c_str();
 		qs += "\">";
 
-		string word = my_flash_card.get_word();
+		string word = current_word_list.get_word();
 		word[0] = toupper(word[0]);
 
 		qs += word.c_str();
@@ -90,7 +92,7 @@ void Wordsmart::show_flashcard() {
 		ui.textBrowser->setText(qs);
 	}
 	else {
-		WordInfo* w = my_words.get_word_info(my_flash_card.get_word());
+		WordInfo* w = my_words.get_word_info(current_word_list.get_word());
 
 		QString qs = "<h2 style='font-family:Verdana'> ";
 		string word = w->get_word().c_str();
@@ -114,23 +116,24 @@ void Wordsmart::show_flashcard() {
 	}
 }
 void Wordsmart::flashcard_clicked(bool does_user_know) {
-	if (my_flash_card.is_flashcard_empty()) {
+	WordList& current_word_list = word_list_manager.get_current_word_list();
+	if (current_word_list.is_flashcard_empty()) {
 		show_flashcard();
 		return;
 	}
 
-	my_flash_card.flip();
+	current_word_list.flip();
 
-	if (my_flash_card.is_showing_word()) {
+	if (current_word_list.is_showing_word()) {
 		// User memorized the word
 		if (does_user_know) {
-			my_flash_card.user_memorized();
+			current_word_list.user_memorized();
 		}
 		else {
-			my_flash_card.user_forgot();
+			current_word_list.user_forgot();
 		}
 		ui.statusBar->showMessage("");
-		my_flash_card.next_word();
+		current_word_list.next_word();
 	}
 	else {
 		ui.statusBar->showMessage("Left click - I know this word / Right click - I don't know this word");
@@ -166,8 +169,11 @@ void Wordsmart::flash_cards() {
 	show_flashcard();
 }
 void Wordsmart::fetch_word_list() {
-	std::set<string>& my_word_list = my_words.get_word_list();
-	std::set<string>::iterator itr = my_word_list.begin();
+	if (word_list_manager.is_empty()) return;
+
+	// If current word list is not empty, fetch it
+	auto& my_word_list = word_list_manager.get_current_word_list().get_words();
+	auto itr = my_word_list.begin();
 
 	if (ui.listWidget->count() < my_word_list.size()) {
 		int num = my_word_list.size() - ui.listWidget->count();
@@ -184,10 +190,35 @@ void Wordsmart::fetch_word_list() {
 			i--;
 			continue;
 		}
-		if (item->text().toStdString() != *itr) {
-			ui.listWidget->insertItem(i, (*itr).c_str());
+		if (item->text().toStdString() != itr->first) {
+			ui.listWidget->insertItem(i, (itr->first).c_str());
 		}
 		itr++;
+	}
+
+	// show List of word lists here
+	auto& word_lists = word_list_manager.get_word_list();
+	if (ui.listWidget_2->count() < word_lists.size()) {
+		int num = word_lists.size() - ui.listWidget_2->count();
+		while (num) {
+			ui.listWidget_2->addItem("");
+			num--;
+		}
+	}
+
+	auto itr2 = word_lists.begin();
+	for (int i = 0; i < ui.listWidget_2->count(); i++) {
+		QListWidgetItem* item = ui.listWidget_2->item(i);
+		if (itr2 == word_lists.end()) {
+			// Remove the rest of the ListWidget
+			ui.listWidget_2->takeItem(i);
+			i--;
+			continue;
+		}
+		if (item->text().toStdWString() != itr2->get_name()) {
+			ui.listWidget_2->insertItem(i, Util::wstr_to_str(itr2->get_name()).c_str());
+		}
+		itr2++;
 	}
 }
 void Wordsmart::word_list() {
@@ -197,8 +228,9 @@ void Wordsmart::word_list() {
 void Wordsmart::word_is_found(const WordInfo& w)
 {
 	notification->show_notification(w);
+	word_list_manager.add_word(w.get_word());
+
 	fetch_word_list();
-	my_flash_card.set_word_list(my_words.get_word_list());
 
 	std::wofstream out("saved_wordlist.wrd");
 
@@ -207,8 +239,9 @@ void Wordsmart::word_is_found(const WordInfo& w)
 	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
 	out.imbue(loc);
 	my_words.write_save_file(out);
+	word_list_manager.write_word_list(out);
 }
-void Wordsmart::list_word_clicked(QListWidgetItem *item)
+void Wordsmart::word_clicked(QListWidgetItem *item)
 {
 	current_selected_word = item->text().toStdString();
 	WordInfo* w = my_words.get_word_info(current_selected_word);
@@ -233,13 +266,19 @@ void Wordsmart::list_word_clicked(QListWidgetItem *item)
 	qs += "</ul>";
 	ui.textBrowser_2->setText(qs);
 }
+void Wordsmart::word_list_clicked(QListWidgetItem* item) {
+	// Select the current word list
+	word_list_manager.select_word_list(item->listWidget()->row(item));
+
+	// Refresh the words of current list
+	fetch_word_list();
+}
 void Wordsmart::delete_word()
 {
 	if (!current_selected_word.size()) return;
-	my_words.delete_word(current_selected_word);
+	word_list_manager.delete_current_word(current_selected_word);
 
 	fetch_word_list();
-	my_flash_card.set_word_list(my_words.get_word_list());
 
 	std::wofstream out("saved_wordlist.wrd");
 
@@ -248,6 +287,7 @@ void Wordsmart::delete_word()
 	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
 	out.imbue(loc);
 	my_words.write_save_file(out);
+	word_list_manager.write_word_list(out);
 }
 Wordsmart::~Wordsmart()
 {
