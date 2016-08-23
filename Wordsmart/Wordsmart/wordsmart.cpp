@@ -2,11 +2,17 @@
 #include <qmessagebox.h>
 #include <QClipboard>
 #include <qdebug.h>
+#include <QInputDialog>
+#include <QMessageBox>
+
+// static variable initialize
+QNetworkAccessManager WordInfo::qnam;
 
 Wordsmart::Wordsmart(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+	download_words.setup(&ui, &my_words, &word_list_manager);
 
 	clipboard = QApplication::clipboard();
 	connect(clipboard, &QClipboard::changed, this, &Wordsmart::clipboard_changed);
@@ -18,7 +24,83 @@ Wordsmart::Wordsmart(QWidget *parent)
 
 	ui.textBrowser->viewport()->installEventFilter(this);
 	
+	// Set custom right click behavior for list widgets
+	ui.listWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui.listWidget_2, &QListWidget::customContextMenuRequested, this, &Wordsmart::show_context_menu_2);
+
 	notification = new Notify;
+}
+void Wordsmart::show_context_menu_2(const QPoint& pos)
+{
+	// Handle global position
+	QPoint globalPos = ui.listWidget_2->mapToGlobal(pos);
+
+	// Create menu and insert some actions
+	QMenu myMenu;
+	myMenu.addAction("Delete List", this, &Wordsmart::delete_word_list);
+	myMenu.addAction("Rename List", this, &Wordsmart::rename_word_list);
+	myMenu.addAction("Merge List", this, &Wordsmart::merge_word_list);
+
+	// Show context menu at handling position
+	myMenu.exec(globalPos);
+}
+void Wordsmart::rename_word_list()
+{
+	if (word_list_manager.is_empty()) return;
+
+	bool result;
+	QString text = QInputDialog::getText(this, 
+		tr("Edit"), 
+		tr("Rename"),
+		QLineEdit::Normal,
+		tr(Util::wstr_to_str(word_list_manager.get_current_word_list().get_name()).c_str()), 
+		&result);
+
+	if (result && !text.isEmpty()) {
+		word_list_manager.get_current_word_list().set_name(text.toStdWString());
+		fetch_word_list();
+	}
+}
+void Wordsmart::delete_word_list()
+{
+	if (word_list_manager.is_empty()) return;
+
+	auto current = word_list_manager.get_current_word_list();
+	QMessageBox msgBox;
+	msgBox.setText(
+		tr("You are deleting Word List <")
+		+ tr(Util::wstr_to_str(current.get_name()).c_str())
+		+ tr(">")
+	);
+
+	msgBox.setInformativeText("Do you really want to delete it?");
+	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+	msgBox.setDefaultButton(QMessageBox::Cancel);
+	int ret = msgBox.exec();
+
+	if(ret == QMessageBox::Ok) {
+		word_list_manager.delete_current_word_list();
+		fetch_word_list();
+	}
+}
+void Wordsmart::merge_word_list()
+{
+	if (word_list_manager.is_empty()) return;
+
+	auto items = ui.listWidget_2->selectedItems();
+
+	vector<int> selected;
+	for (int i = 0; i < items.size(); i++) {
+		selected.push_back(ui.listWidget_2->row(items[i]));
+	}
+
+	word_list_manager.merge_word_list(selected);
+
+	for (int i = 1; i < items.size(); i++) {
+		ui.listWidget_2->removeItemWidget(items[i]);
+	}
+
+	fetch_word_list();
 }
 bool Wordsmart::load_saved_wordlist()
 {
@@ -163,6 +245,12 @@ void Wordsmart::create_action() {
 	connect(ui.actionVersion, &QAction::triggered, this, &Wordsmart::show_version);
 	connect(ui.actionFlash_Cards, &QAction::triggered, this, &Wordsmart::flash_cards);
 	connect(ui.actionYour_Word_List, &QAction::triggered, this, &Wordsmart::word_list);
+	connect(ui.actionDownload_Online, &QAction::triggered, this, &Wordsmart::show_download_words);
+	
+}
+void Wordsmart::show_download_words()
+{
+	ui.stackedWidget->setCurrentIndex(2);
 }
 void Wordsmart::flash_cards() {
 	ui.stackedWidget->setCurrentIndex(0);

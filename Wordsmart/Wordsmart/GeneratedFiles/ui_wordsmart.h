@@ -36,6 +36,7 @@ public:
     QAction *actionVersion;
     QAction *actionFlash_Cards;
     QAction *actionYour_Word_List;
+    QAction *actionDownload_Online;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     QStackedWidget *stackedWidget;
@@ -52,6 +53,10 @@ public:
     QPushButton *pushButton_2;
     QPushButton *pushButton;
     QWidget *page_3;
+    QHBoxLayout *horizontalLayout_2;
+    QListWidget *listWidget_3;
+    QListWidget *listWidget_4;
+    QListWidget *listWidget_5;
     QMenuBar *menuBar;
     QMenu *menuWho;
     QMenu *menu;
@@ -69,6 +74,8 @@ public:
         actionFlash_Cards->setObjectName(QStringLiteral("actionFlash_Cards"));
         actionYour_Word_List = new QAction(WordsmartClass);
         actionYour_Word_List->setObjectName(QStringLiteral("actionYour_Word_List"));
+        actionDownload_Online = new QAction(WordsmartClass);
+        actionDownload_Online->setObjectName(QStringLiteral("actionDownload_Online"));
         centralWidget = new QWidget(WordsmartClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -102,6 +109,9 @@ public:
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         listWidget_2 = new QListWidget(page_2);
         listWidget_2->setObjectName(QStringLiteral("listWidget_2"));
+        listWidget_2->setMaximumSize(QSize(400, 16777215));
+        listWidget_2->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        listWidget_2->setSelectionRectVisible(false);
 
         horizontalLayout->addWidget(listWidget_2);
 
@@ -142,6 +152,25 @@ public:
         stackedWidget->addWidget(page_2);
         page_3 = new QWidget();
         page_3->setObjectName(QStringLiteral("page_3"));
+        horizontalLayout_2 = new QHBoxLayout(page_3);
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        listWidget_3 = new QListWidget(page_3);
+        listWidget_3->setObjectName(QStringLiteral("listWidget_3"));
+
+        horizontalLayout_2->addWidget(listWidget_3);
+
+        listWidget_4 = new QListWidget(page_3);
+        listWidget_4->setObjectName(QStringLiteral("listWidget_4"));
+
+        horizontalLayout_2->addWidget(listWidget_4);
+
+        listWidget_5 = new QListWidget(page_3);
+        listWidget_5->setObjectName(QStringLiteral("listWidget_5"));
+
+        horizontalLayout_2->addWidget(listWidget_5);
+
         stackedWidget->addWidget(page_3);
 
         verticalLayout_2->addWidget(stackedWidget);
@@ -167,10 +196,11 @@ public:
         menuWho->addAction(actionVersion);
         menu->addAction(actionFlash_Cards);
         menu->addAction(actionYour_Word_List);
+        menu->addAction(actionDownload_Online);
 
         retranslateUi(WordsmartClass);
 
-        stackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(WordsmartClass);
@@ -182,6 +212,7 @@ public:
         actionVersion->setText(QApplication::translate("WordsmartClass", "Version", 0));
         actionFlash_Cards->setText(QApplication::translate("WordsmartClass", "Flash Cards", 0));
         actionYour_Word_List->setText(QApplication::translate("WordsmartClass", "Your Word List", 0));
+        actionDownload_Online->setText(QApplication::translate("WordsmartClass", "Download Wordlist", 0));
         textBrowser->setHtml(QApplication::translate("WordsmartClass", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

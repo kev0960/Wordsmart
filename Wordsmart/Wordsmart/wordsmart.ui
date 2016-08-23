@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -47,7 +47,20 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="page_2">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QListWidget" name="listWidget_2"/>
+         <widget class="QListWidget" name="listWidget_2">
+          <property name="maximumSize">
+           <size>
+            <width>400</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <property name="selectionRectVisible">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QListWidget" name="listWidget">
@@ -99,7 +112,19 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="page_3"/>
+      <widget class="QWidget" name="page_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QListWidget" name="listWidget_3"/>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listWidget_4"/>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listWidget_5"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -125,6 +150,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="actionFlash_Cards"/>
     <addaction name="actionYour_Word_List"/>
+    <addaction name="actionDownload_Online"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuWho"/>
@@ -151,6 +177,11 @@ p, li { white-space: pre-wrap; }
   <action name="actionYour_Word_List">
    <property name="text">
     <string>Your Word List</string>
+   </property>
+  </action>
+  <action name="actionDownload_Online">
+   <property name="text">
+    <string>Download Wordlist</string>
    </property>
   </action>
  </widget>

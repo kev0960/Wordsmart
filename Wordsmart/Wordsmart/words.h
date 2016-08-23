@@ -298,6 +298,9 @@ public:
 	}
 
 	WordList& get_current_word_list() {
+		if (current_word_list >= word_lists.size()) {
+			current_word_list = word_lists.size() - 1;
+		}
 		return word_lists[current_word_list];
 	}
 
@@ -307,13 +310,13 @@ public:
 
 	// Merge word lists into one word list
 	// (It all merges into the least index word list)
-	WordList& merge_word_list(vector<int> selected) {
+	void merge_word_list(vector<int> selected) {
 		std::sort(selected.begin(), selected.end());
 
 		WordList& w = word_lists[selected[0]];
-		for (int i = selected.size() - 1; i >= 0; i --) {
+		for (int i = selected.size() - 1; i > 0; i --) {
 			w.merge(word_lists[selected[i]]);
-			word_lists.erase(word_lists.begin() + i);
+			word_lists.erase(word_lists.begin() + selected[i]);
 		}
 	}
 
@@ -377,6 +380,15 @@ public:
 		}
 		return false; 
 	}
+
+	bool delete_current_word_list() {
+		if (current_word_list < word_lists.size()) {
+			word_lists.erase(word_lists.begin() + current_word_list);
+			return true;
+		}
+		return false; 
+		return false;
+	}
 };
 class WordInfo : public QObject {
 	Q_OBJECT
@@ -393,7 +405,7 @@ class WordInfo : public QObject {
 	QNetworkReply* response_kr;
 	QNetworkReply* response_en;
 
-	QNetworkAccessManager qnam;
+	static QNetworkAccessManager qnam;
 
 	vector<wstring> split_example_sentence(wstring& s) {
 		vector<wstring> v;
@@ -464,45 +476,33 @@ public:
 			emit def_found(word);
 		}
 	}
-	void parse_kr_dic() {
-		kr_def_parse_done = true;
-
-		// Network Error occured
-		if (response_kr->error() != QNetworkReply::NoError) {
-			emit kr_def_found();
-			return;
-		}
-
-		response_kr->close();
-
+	void parse_kr(wstring& html_str) 
+	{
 		/*
-		
+
 		DAUM English Dictionary Response Format
 
 		<ul class="list_search">
-			<li>
-				<span text_search="">
-				<daum:word> { Meaning } </daum:word>
-				<daum:word> { of } </daum:word>
-				<daum:word> { the } </daum:word>
-				<daum:word> { word } </daum:word> 
+		<li>
+		<span text_search="">
+		<daum:word> { Meaning } </daum:word>
+		<daum:word> { of } </daum:word>
+		<daum:word> { the } </daum:word>
+		<daum:word> { word } </daum:word>
 
-				** To parse this, we need to get each partial part of
-				the meaning and concantenate it. 
+		** To parse this, we need to get each partial part of
+		the meaning and concantenate it.
 
-				** sometimes the response does not contain <daum:word> but instead
-				just a simple <span class="text_search">
+		** sometimes the response does not contain <daum:word> but instead
+		just a simple <span class="text_search">
 
-			</li>
-			<li>
-			<daum:word> { Meaning of the word } </daum:word>
-			</li>
+		</li>
+		<li>
+		<daum:word> { Meaning of the word } </daum:word>
+		</li>
 		</ul>
-		
-		*/
-		QString html = QString::fromUtf8(response_kr->readAll());
-		wstring html_str = html.toStdWString();
 
+		*/
 		wstring key_class = L"<ul class=\"list_search\">";
 		wstring end_tag = L"</ul>";
 
@@ -541,23 +541,30 @@ public:
 						break;
 					}
 				}
-
+			
 				found = def.find(L"<li>", end + 1);
 			}
 		}
 	}
-	void parse_en_dic() {
-		en_def_parse_done = true;
+	void parse_kr_dic() {
+		kr_def_parse_done = true;
 
 		// Network Error occured
-		if (response_en->error() != QNetworkReply::NoError) {
-			emit en_def_found();
+		if (response_kr->error() != QNetworkReply::NoError) {
+			emit kr_def_found();
 			return;
 		}
 
-		response_en->close();
+		response_kr->close();
+		QString html = QString::fromUtf8(response_kr->readAll());
+		wstring html_str = html.toStdWString();
 
-		wstring html = QString::fromUtf8(response_en->readAll()).toStdWString();
+		parse_kr(html_str);
+
+		emit kr_def_found();
+	}
+
+	void parse_en(wstring& html) {
 		wstring key_tag = L"<li>";
 		wstring end_tag = L"</li>";
 
@@ -566,12 +573,12 @@ public:
 		Wordnet Online Search Format
 
 		<li>
-			<a class="pos"> { n, v, adj ... } </a>
-			<a class="...."> { synynoms } </a>
-			<a class="...."> { synynoms } </a>
-			...
-			{ Definition of the word goes here }
-			<i> { word usage in a sentence } </i>
+		<a class="pos"> { n, v, adj ... } </a>
+		<a class="...."> { synynoms } </a>
+		<a class="...."> { synynoms } </a>
+		...
+		{ Definition of the word goes here }
+		<i> { word usage in a sentence } </i>
 		</li>
 
 		*/
@@ -641,6 +648,20 @@ public:
 			found = html.find(key_tag, found + 1);
 			i++;
 		}
+	}
+	void parse_en_dic() {
+		en_def_parse_done = true;
+
+		// Network Error occured
+		if (response_en->error() != QNetworkReply::NoError) {
+			emit en_def_found();
+			return;
+		}
+
+		response_en->close();
+
+		wstring html = QString::fromUtf8(response_en->readAll()).toStdWString();
+		parse_en(html);
 
 		emit en_def_found();
 	}
@@ -674,6 +695,8 @@ public:
 	}
 
 	string get_word() const { return word;  }
+	void set_word(string s) { word = s; }
+
 	void inc_freqeuncy() { frequency++; }
 	int get_frequency() { return frequency; }
 
@@ -749,6 +772,14 @@ public:
 		}
 
 		return true;
+	}
+	bool register_word(string word, WordInfo* word_info) {
+		if (registered_words.find(word) == registered_words.end()) {
+			registered_words[word] = word_info;
+			found_words.insert(word);
+			return true;
+		}
+		return false;
 	}
 
 	void word_is_found(string word) {
@@ -838,7 +869,6 @@ public:
 		Parser::HTMLParser parser(file_data);
 		Parser::DOMTree::iterator itr = parser.DOM().begin();
 
-		
 		wstring current_word; 
 		vector<wstring> kr_definition, en_definition;
 

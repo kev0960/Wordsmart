@@ -5,6 +5,7 @@
 #include "ui_wordsmart.h"
 #include "words.h"
 #include "def_notify.h"
+#include "download_words.h"
 
 class Wordsmart : public QMainWindow
 {
@@ -51,6 +52,18 @@ private:
 
 	// Desktop notification when the definition of the word is found
 	Notify* notification;
+
+	// Custom context menu for listwidgets
+	void show_context_menu_2(const QPoint& pos);
+
+	void rename_word_list();
+	void delete_word_list();
+	void merge_word_list();
+
+	// Word Download
+	DownloadWordList download_words;
+
+	void show_download_words();
 };
 
 

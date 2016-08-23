@@ -65,6 +65,12 @@
     <ClCompile Include="def_notify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_download_words.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_download_words.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="wordsmart.h">
@@ -83,6 +89,9 @@
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="def_notify.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="download_words.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
