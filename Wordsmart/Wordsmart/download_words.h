@@ -14,6 +14,7 @@
 #include <QtNetwork>
 #include <QUrl>
 #include <QNetworkAccessManager>
+#include <QMessageBox>
 #include "ui_wordsmart.h"
 #include "words.h"
 
@@ -49,6 +50,7 @@ private:
 	int num_download_done;
 
 	vector<bool> download_done;
+	bool download_in_progress;
 
 	vector<wordlist_content> down_avail;
 
@@ -65,13 +67,13 @@ signals:
 	void def_found(int index);
 
 public:
-	DownloadWordList() {
+	DownloadWordList() : download_in_progress(false) {
 	}
 
 	// Query the server
 	void query_wordsmart_server()
 	{
-		QUrl server_url("http://localhost/all-word-list");
+		QUrl server_url("http://104.199.179.40/all-word-list");
 		response_wordlist = qnam.get(QNetworkRequest(server_url));
 		connect(response_wordlist, &QNetworkReply::finished, this, &DownloadWordList::server_response_ready);
 	}
@@ -189,7 +191,7 @@ public:
 
 	void query_words()
 	{
-		string url = "http://localhost/word-list/" + Util::wstr_to_str(down_avail[current_title].name)
+		string url = "http://104.199.179.40/word-list/" + Util::wstr_to_str(down_avail[current_title].name)
 			+ "/" + Util::wstr_to_str(down_avail[current_title].word_list_name[word_list_index]);
 		
 		QUrl server_url(url.c_str());
@@ -243,9 +245,20 @@ public:
 		}
 	}
 
-	// Max download at one time = 5 words;
+	// Max download at one time = 3 words; 
+	// (limit on QNetworkAccessManager) 
 	void start_download_word_list()
 	{
+		// Cannot start the download when the download is in progress
+		if (download_in_progress) {
+			QMessageBox msg_box;
+			msg_box.setText("Sorry! Wait for other downloads to be completed");  
+			msg_box.exec();
+			return;
+		}
+
+		download_in_progress = true;
+
 		const int max_download = 3;
 		num_download_done = 0;
 
@@ -286,9 +299,6 @@ public:
 		word_response[index * 2] = qnam.get(QNetworkRequest(kr_url));
 		word_response[index * 2 + 1] = qnam.get(QNetworkRequest(en_url));
 
-		word_response[index * 2]->setObjectName(std::to_string(index * 2).c_str());
-		word_response[index * 2 + 1]->setObjectName(std::to_string(index * 2 + 1).c_str());
-
 		connect(word_response[index * 2], &QNetworkReply::finished, this, &DownloadWordList::parse_kr);
 		connect(word_response[index * 2 + 1], &QNetworkReply::finished, this, &DownloadWordList::parse_en);
 	}
@@ -324,12 +334,6 @@ public:
 			}
 		}
 
-		/*
-		if (index == -1) {
-			index = Util::wstr_to_long_long(sender()->objectName().toStdWString());
-		}
-		*/
-
 		if (word_response[index]->error() != QNetworkReply::NoError) {
 			emit en_def_found(index);
 			return;
@@ -349,7 +353,13 @@ public:
 				word_infos[index]
 			);
 
-			num_download_done ++;
+			num_download_done++;
+
+			string status_msg = "[" + Util::wstr_to_str(current_download_word[index])
+				+ "] is fetched (" + std::to_string(num_download_done)
+				+ "/" + std::to_string(downloading_words.size()) + ")";
+
+			ui->statusBar->showMessage(status_msg.c_str());
 
 			if (total_download < downloading_words.size()) {
 				current_download_word[index] = downloading_words[total_download];
@@ -374,6 +384,18 @@ public:
 					new_word_list.add_word(Util::wstr_to_str(downloading_words[i]));
 				}
 				words_manager->add_word_list(new_word_list);
+				download_in_progress = false; 
+
+				ui->statusBar->showMessage("Download complete!");
+
+				std::wofstream out("saved_wordlist.wrd");
+
+				// Sine MSVC does not have support on UTF-8 output, we have to 
+				// manually specify it
+				std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
+				out.imbue(loc);
+				words->write_save_file(out);
+				words_manager->write_word_list(out);
 			}
 		}
 		else {

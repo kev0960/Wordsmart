@@ -20,13 +20,15 @@ Wordsmart::Wordsmart(QWidget *parent)
 
 	connect(ui.listWidget, &QListWidget::itemPressed, this, &Wordsmart::word_clicked);
 	connect(ui.listWidget_2, &QListWidget::itemPressed, this, &Wordsmart::word_list_clicked);
-	connect(ui.pushButton_2, &QPushButton::clicked, this, &Wordsmart::delete_word);
 
 	ui.textBrowser->viewport()->installEventFilter(this);
 	
 	// Set custom right click behavior for list widgets
 	ui.listWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui.listWidget_2, &QListWidget::customContextMenuRequested, this, &Wordsmart::show_context_menu_2);
+
+	ui.listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui.listWidget, &QListWidget::customContextMenuRequested, this, &Wordsmart::show_context_menu);
 
 	notification = new Notify;
 }
@@ -40,6 +42,18 @@ void Wordsmart::show_context_menu_2(const QPoint& pos)
 	myMenu.addAction("Delete List", this, &Wordsmart::delete_word_list);
 	myMenu.addAction("Rename List", this, &Wordsmart::rename_word_list);
 	myMenu.addAction("Merge List", this, &Wordsmart::merge_word_list);
+
+	// Show context menu at handling position
+	myMenu.exec(globalPos);
+}
+void Wordsmart::show_context_menu(const QPoint& pos)
+{
+	// Handle global position
+	QPoint globalPos = ui.listWidget->mapToGlobal(pos);
+
+	// Create menu and insert some actions
+	QMenu myMenu;
+	myMenu.addAction("Delete Word", this, &Wordsmart::delete_word);
 
 	// Show context menu at handling position
 	myMenu.exec(globalPos);

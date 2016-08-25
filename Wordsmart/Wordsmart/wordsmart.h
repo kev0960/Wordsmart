@@ -55,6 +55,7 @@ private:
 
 	// Custom context menu for listwidgets
 	void show_context_menu_2(const QPoint& pos);
+	void show_context_menu(const QPoint& pos);
 
 	void rename_word_list();
 	void delete_word_list();

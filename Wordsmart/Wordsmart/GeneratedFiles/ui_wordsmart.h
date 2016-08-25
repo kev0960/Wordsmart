@@ -13,14 +13,12 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextBrowser>
@@ -47,11 +45,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QListWidget *listWidget_2;
     QListWidget *listWidget;
-    QGroupBox *groupBox;
-    QVBoxLayout *verticalLayout_3;
     QTextBrowser *textBrowser_2;
-    QPushButton *pushButton_2;
-    QPushButton *pushButton;
     QWidget *page_3;
     QHBoxLayout *horizontalLayout_2;
     QListWidget *listWidget_3;
@@ -124,30 +118,11 @@ public:
 
         horizontalLayout->addWidget(listWidget);
 
-        groupBox = new QGroupBox(page_2);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
-        verticalLayout_3 = new QVBoxLayout(groupBox);
-        verticalLayout_3->setSpacing(6);
-        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        textBrowser_2 = new QTextBrowser(groupBox);
+        textBrowser_2 = new QTextBrowser(page_2);
         textBrowser_2->setObjectName(QStringLiteral("textBrowser_2"));
         textBrowser_2->setFont(font);
 
-        verticalLayout_3->addWidget(textBrowser_2);
-
-        pushButton_2 = new QPushButton(groupBox);
-        pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
-
-        verticalLayout_3->addWidget(pushButton_2);
-
-        pushButton = new QPushButton(groupBox);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-
-        verticalLayout_3->addWidget(pushButton);
-
-
-        horizontalLayout->addWidget(groupBox);
+        horizontalLayout->addWidget(textBrowser_2);
 
         stackedWidget->addWidget(page_2);
         page_3 = new QWidget();
@@ -200,7 +175,7 @@ public:
 
         retranslateUi(WordsmartClass);
 
-        stackedWidget->setCurrentIndex(2);
+        stackedWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(WordsmartClass);
@@ -218,9 +193,6 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'\353\247\221\354\235\200 \352\263\240\353\224\225'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana';\"><br /></p></body></html>", 0));
-        groupBox->setTitle(QApplication::translate("WordsmartClass", "GroupBox", 0));
-        pushButton_2->setText(QApplication::translate("WordsmartClass", "Delete Word", 0));
-        pushButton->setText(QApplication::translate("WordsmartClass", "Save List to Excel File", 0));
         menuWho->setTitle(QApplication::translate("WordsmartClass", "Help", 0));
         menu->setTitle(QApplication::translate("WordsmartClass", "Learn Words", 0));
     } // retranslateUi

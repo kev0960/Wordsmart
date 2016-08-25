@@ -41,7 +41,6 @@ namespace Parser {
 
 		inline wstring inner_html();
 	};
-
 	class DOMTree
 	{
 		HTMLElement* top;
