@@ -105,5 +105,17 @@
     <ClInclude Include="HTMLParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="wordsmart.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icon1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Wordsmart.rc" />
   </ItemGroup>
 </Project>

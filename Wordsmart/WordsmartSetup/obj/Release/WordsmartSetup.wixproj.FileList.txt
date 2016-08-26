@@ -1,0 +1,6 @@
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Release\WordsmartSetup.msi
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Release\WordsmartSetup.wixpdb
+obj\Release\Product.wixobj
+obj\Release\WordsmartSetup.wixproj.BindContentsFileListnull.txt
+obj\Release\WordsmartSetup.wixproj.BindOutputsFileListnull.txt
+obj\Release\WordsmartSetup.wixproj.BindBuiltOutputsFileListnull.txt

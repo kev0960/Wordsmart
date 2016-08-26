@@ -1,0 +1,7 @@
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Debug\WordsmartSetup.msi
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Debug\WordsmartSetup.wixpdb
+obj\Debug\Product.wixobj
+obj\Debug\WordsmartSetup.wixproj.BindContentsFileListnull.txt
+obj\Debug\WordsmartSetup.wixproj.BindOutputsFileListnull.txt
+obj\Debug\WordsmartSetup.wixproj.BindBuiltOutputsFileListnull.txt
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Debug\cab1.cab

@@ -1,9 +1,2 @@
-﻿  Moc'ing words.h...
-  def_notify.cpp
-  moc_def_notify.cpp
-  moc_words.cpp
-  moc_wordsmart.cpp
-  main.cpp
-  wordsmart.cpp
-  Generating Code...
+﻿  wordsmart.cpp
   Wordsmart.vcxproj -> C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\x64\Release\Wordsmart.exe

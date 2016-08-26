@@ -1,0 +1,3 @@
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Debug\cab1.cab
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Debug\WordsmartSetup.msi
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Debug\WordsmartSetup.wixpdb

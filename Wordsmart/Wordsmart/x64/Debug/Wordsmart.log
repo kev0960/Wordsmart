@@ -1,11 +1,3 @@
-﻿  Moc'ing download_words.h...
-  moc_def_notify.cpp
-  moc_download_words.cpp
-  moc_words.cpp
-  moc_wordsmart.cpp
-  def_notify.cpp
-  wordsmart.cpp
-  Generating Code...
-  main.cpp
+﻿  wordsmart.cpp
   Wordsmart.vcxproj -> C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\x64\Debug\Wordsmart.exe
   Wordsmart.vcxproj -> C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\x64\Debug\Wordsmart.pdb (Full PDB)

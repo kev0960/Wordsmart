@@ -14,6 +14,8 @@ Wordsmart::Wordsmart(QWidget *parent)
 	ui.setupUi(this);
 	download_words.setup(&ui, &my_words, &word_list_manager);
 
+	setWindowIcon(QIcon("wordsmart.ico"));
+
 	clipboard = QApplication::clipboard();
 	connect(clipboard, &QClipboard::changed, this, &Wordsmart::clipboard_changed);
 	create_action();
@@ -212,6 +214,8 @@ void Wordsmart::show_flashcard() {
 	}
 }
 void Wordsmart::flashcard_clicked(bool does_user_know) {
+	if (word_list_manager.is_empty()) return;
+
 	WordList& current_word_list = word_list_manager.get_current_word_list();
 	if (current_word_list.is_flashcard_empty()) {
 		show_flashcard();

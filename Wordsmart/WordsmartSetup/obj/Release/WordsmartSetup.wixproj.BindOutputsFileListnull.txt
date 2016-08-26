@@ -1,0 +1,2 @@
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Release\WordsmartSetup.msi
+C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\WordsmartSetup\bin\Release\WordsmartSetup.wixpdb
