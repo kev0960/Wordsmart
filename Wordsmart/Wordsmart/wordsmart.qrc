@@ -1,3 +1,5 @@
 <RCC>
-    <qresource prefix="/Wordsmart"/>
+    <qresource prefix="/Wordsmart">
+        <file>wordsmart.png</file>
+    </qresource>
 </RCC>

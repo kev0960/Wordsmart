@@ -15,6 +15,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
@@ -51,6 +52,9 @@ public:
     QListWidget *listWidget_3;
     QListWidget *listWidget_4;
     QListWidget *listWidget_5;
+    QWidget *page_4;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *label;
     QMenuBar *menuBar;
     QMenu *menuWho;
     QMenu *menu;
@@ -147,6 +151,19 @@ public:
         horizontalLayout_2->addWidget(listWidget_5);
 
         stackedWidget->addWidget(page_3);
+        page_4 = new QWidget();
+        page_4->setObjectName(QStringLiteral("page_4"));
+        horizontalLayout_3 = new QHBoxLayout(page_4);
+        horizontalLayout_3->setSpacing(6);
+        horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        label = new QLabel(page_4);
+        label->setObjectName(QStringLiteral("label"));
+        label->setStyleSheet(QStringLiteral("border-image: url(:/Wordsmart/wordsmart.png) 0 0 0 0 stretch stretch;"));
+
+        horizontalLayout_3->addWidget(label);
+
+        stackedWidget->addWidget(page_4);
 
         verticalLayout_2->addWidget(stackedWidget);
 
@@ -175,7 +192,7 @@ public:
 
         retranslateUi(WordsmartClass);
 
-        stackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(WordsmartClass);
@@ -193,6 +210,7 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'\353\247\221\354\235\200 \352\263\240\353\224\225'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana';\"><br /></p></body></html>", 0));
+        label->setText(QString());
         menuWho->setTitle(QApplication::translate("WordsmartClass", "Help", 0));
         menu->setTitle(QApplication::translate("WordsmartClass", "Learn Words", 0));
     } // retranslateUi

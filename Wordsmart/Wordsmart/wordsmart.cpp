@@ -14,7 +14,7 @@ Wordsmart::Wordsmart(QWidget *parent)
 	ui.setupUi(this);
 	download_words.setup(&ui, &my_words, &word_list_manager);
 
-	setWindowIcon(QIcon("wordsmart.ico"));
+	setWindowIcon(QIcon(":/Wordsmart/wordsmart.ico"));
 
 	clipboard = QApplication::clipboard();
 	connect(clipboard, &QClipboard::changed, this, &Wordsmart::clipboard_changed);
@@ -158,6 +158,16 @@ void Wordsmart::show_flashcard() {
 
 	WordList& current_word_list = word_list_manager.get_current_word_list();
 
+	if (current_word_list.all_words_memorized()) {
+		string top_margin = std::to_string(ui.textBrowser->size().height() / 2 - 85);
+		QString qs = "<br><p align=\"center\" style=\"font-size:50px;margin-top:";
+		qs += top_margin.c_str();
+		qs += "\">You have memorized every words in this list!</p>";
+
+		ui.textBrowser->setText(qs);
+		return;
+	}
+
 	if (current_word_list.is_showing_word()) {
 		QString qs = "<div align=\"right\" style=\"font-size:small;vertical-align:top;";
 
@@ -177,7 +187,10 @@ void Wordsmart::show_flashcard() {
 
 
 		string top_margin = std::to_string(ui.textBrowser->size().height() / 2 - 85);
-		qs += "</div><br><p align=\"center\" style=\"font-size:50px;margin-top:";
+		qs += "</div><span>";
+		qs += ("  [" + std::to_string(current_word_list.get_current_index() + 1)
+			+ "/" + std::to_string(current_word_list.get_words().size()) + "]").c_str();
+		qs += "</span><br> < p align = \"center\" style=\"font-size:50px;margin-top:";
 		qs += top_margin.c_str();
 		qs += "\">";
 
@@ -315,6 +328,7 @@ void Wordsmart::fetch_word_list() {
 	auto itr2 = word_lists.begin();
 	for (int i = 0; i < ui.listWidget_2->count(); i++) {
 		QListWidgetItem* item = ui.listWidget_2->item(i);
+
 		if (itr2 == word_lists.end()) {
 			// Remove the rest of the ListWidget
 			ui.listWidget_2->takeItem(i);
@@ -326,6 +340,11 @@ void Wordsmart::fetch_word_list() {
 		}
 		itr2++;
 	}
+
+	for (int i = 0; i < ui.listWidget_2->count(); i++) {
+		ui.listWidget_2->item(i)->setTextColor(word_lists[i].get_color());
+	}
+	
 }
 void Wordsmart::word_list() {
 	ui.stackedWidget->setCurrentIndex(1);
@@ -337,15 +356,6 @@ void Wordsmart::word_is_found(const WordInfo& w)
 	word_list_manager.add_word(w.get_word());
 
 	fetch_word_list();
-
-	std::wofstream out("saved_wordlist.wrd");
-
-	// Sine MSVC does not have support on UTF-8 output, we have to 
-	// manually specify it
-	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
-	out.imbue(loc);
-	my_words.write_save_file(out);
-	word_list_manager.write_word_list(out);
 }
 void Wordsmart::word_clicked(QListWidgetItem *item)
 {
@@ -386,16 +396,17 @@ void Wordsmart::delete_word()
 
 	fetch_word_list();
 
-	std::wofstream out("saved_wordlist.wrd");
 
-	// Sine MSVC does not have support on UTF-8 output, we have to 
-	// manually specify it
-	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
-	out.imbue(loc);
-	my_words.write_save_file(out);
-	word_list_manager.write_word_list(out);
+	
 }
 Wordsmart::~Wordsmart()
 {
+	// Sine MSVC does not have support on UTF-8 output, we have to 
+	// manually specify it
+	std::wofstream out("saved_wordlist.wrd");
+	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
+	out.imbue(loc);
 
+	my_words.write_save_file(out);
+	word_list_manager.write_word_list(out);
 }

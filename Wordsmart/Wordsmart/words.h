@@ -67,25 +67,40 @@ public:
 	// Finally, if the user has managed to pass last 3 checks for 3 weeks, 
 	// the word will be registered as a permanent memorization.
 	bool present_word() {
+		const int min_passed_test = 3;
+		const int min_score = 3;
+
 		// Check from the back
 		int cnt = 0;
-		for (int i = score.size() - 1; i >= max(0, static_cast<int>(score.size()) - 3); i--) {
-			if (score[i] == 3) cnt++;
+		for (int i = score.size() - 1; i >= max(0, static_cast<int>(score.size()) - min_passed_test); i--) {
+			if (score[i] >= min_score) cnt++;
 		}
 
-		if (cnt < 3) return true;
+		if (cnt < min_passed_test) return true;
 
 		int i = score.size() - 1;
 		while (i >= 0) {
-			if (score[i] < 3) break;
+			if (score[i] < min_passed_test) break;
 			i--;
 		}
 		if (i < 0) i= 0;
 
-		if (memorized[i] <= time(0) - 60 * 60 * 24 * 7 * 3) {
+		if (memorized[i] <= time(0) - 60 * 60 * 24 * 7 * 3) { 
 			return false;
 		}
 		return true;
+	}
+	bool recent_memorized() {
+		const int min_score = 3;
+		if (!memorized.size()) return false; 
+		time_t last = memorized.back();
+
+		// If you have memorized the word less than 2 hours ago,
+		// do not present in a flashcard temporarily
+		if (time(0) - last <= 60 * 60 * 2 && score.back() >= min_score) {
+			return true;
+		}
+		return false; 
 	}
 	string last_visited() {
 		if (!score.size()) return "";
@@ -122,9 +137,9 @@ public:
 
 		time_t now = time(0);
 
-		// If the difference between last visit is less than 12 hours,
+		// If the difference between last visit is less than 2 hours,
 		// we consider that the user is continuing his flashcard practice
-		if (now - memorized.back() < 12 * 3600) {
+		if (now - memorized.back() < 2 * 3600) {
 			score.back() += sc;
 		}
 		else {
@@ -149,9 +164,9 @@ public:
 
 		time_t now = time(0);
 
-		// If the difference between last visit is less than 12 hours,
+		// If the difference between last visit is less than 2 hours,
 		// we consider that the user is continuing his flashcard practice
-		if (now - memorized.back() < 12 * 3600) {
+		if (now - memorized.back() < 2 * 3600) {
 			return score.back();
 		}
 		else {
@@ -188,14 +203,21 @@ public:
 		}
 		words.push_back(std::make_pair(s, Memorize()));
 
+		if (current_word == -1) {
+			current_word = words.size() - 1;
+		}
+
 		return true;
 	}
-
 	bool add_word(string s, Memorize& mem) {
 		for (int i = 0; i < words.size(); i++) {
 			if (words[i].first == s) return false;
 		}
 		words.push_back(std::make_pair(s, mem));
+
+		if (current_word == -1) {
+			current_word = words.size() - 1;
+		}
 
 		return true;
 	}
@@ -204,6 +226,8 @@ public:
 		for (int i = 0; i < words.size(); i++) {
 			if (words[i].first == word) {
 				words.erase(words.begin() + i);
+
+				if (current_word > words.size()) current_word = words.size() - 1;
 				return true;
 			}
 		}
@@ -250,38 +274,97 @@ public:
 	}
 
 	void user_memorized() {
-		words[current_word].second.add_score(1);
+		if (current_word != -1) {
+			words[current_word].second.add_score(1);
+		}
 	}
 	void user_forgot() {
-		words[current_word].second.user_forget();
+		if (current_word != -1) {
+			words[current_word].second.user_forget();
+		}
 	}
 
 	int memorize_count() {
-		return words[current_word].second.current_score();
+		if (current_word != -1) {
+			return words[current_word].second.current_score();
+		}
+		return -1;
 	}
 
 	// When it goes to the last word, it comes back to the first one
 	bool next_word() {
-		if (current_word >= words.size() - 1) {
-			current_word = 0;
-			return false;
-		}
-		else {
-			current_word++;
-		}
+		int previous_word = current_word;
+		if (current_word == -1) return false;
+
+		do {
+			current_word++; 
+			if (current_word == words.size()) {
+				current_word = 0;
+			}
+			
+			// If all words are memorized so when there is nothing to present
+			// it returns false. 
+			if (current_word == previous_word && words[current_word].second.recent_memorized()) {
+				current_word = -1;
+				return false; 
+			}
+		} while (words[current_word].second.recent_memorized());
 		return true;
 	}
 
 	string get_word() {
-		return words[current_word].first;
+		if (current_word != -1) {
+			return words[current_word].first;
+		}
+		return "";
 	}
 
+	bool all_words_memorized() {
+		if (current_word == -1) return true;
+		else {
+			for (int i = 0; i < words.size(); i++) {
+				if (!words[i].second.recent_memorized()) return false;
+			}
+		}
+		return true; 
+	}
 	bool is_showing_word() {
 		return flashcard_showing_word;
 	}
 
 	bool is_flashcard_empty() {
 		return words.empty();
+	}
+
+	int get_current_index() {
+		return current_word;
+	}
+	// Red :: Most of the words are not memorized (0 ~ 50%)
+	// Yellow : More than half of the words are memorized (50% ~ 90%)
+	// Green : Most of the words are memorized (90 ~ 99%)
+	// Blue : All words are memorized
+	QColor get_color() {
+		int total = words.size(); 
+		if (total == 0) return Qt::green;
+
+		for (int i = 0; i < words.size(); i++) {
+			if (words[i].second.present_word()) total--;
+		}
+
+		float percent = static_cast<float>(total) / words.size();
+
+		if (percent <= 0.5) {
+			return Qt::red;
+		}
+		else if (percent <= 0.9) {
+			return Qt::yellow;
+		}
+		else if (percent == 1.0f) {
+			return Qt::blue;
+		}
+		else {
+			return Qt::green;
+		}
 	}
 };
 class WordListManager {
