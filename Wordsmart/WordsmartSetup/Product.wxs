@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <?define Wordsmart_TargetDir=$(var.Wordsmart.TargetDir)?>
   <Product Id="*" Name="$(var.Wordsmart.TargetFileName)" Language="1033" Version="1.0.0.0" Manufacturer="Jaebum Lee" UpgradeCode="e9bc1ce9-8c58-47fc-be13-30070e600719">
-    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64"/>
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
@@ -14,10 +14,6 @@
       <ComponentGroupRef Id="PlatformDLL" />
     </Feature>
 
-    <Feature Id="VCRedist" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-      <MergeRef Id="VCRedist"/>
-    </Feature>
- 
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER"></Property>
     <WixVariable Id="WixUILicenseRtf" Value="$(var.Wordsmart_TargetDir)LICENSE.rtf" />
     <UIRef Id="WixUI_InstallDir" />
@@ -25,7 +21,7 @@
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
+      <Directory Id="ProgramFiles64Folder">
         <Directory Id="INSTALLFOLDER" Name="Wordsmart">
           <Directory Id="platforms" Name="platforms" />
         </Directory>
@@ -52,37 +48,46 @@
         <RegistryValue Root="HKCU" Key="Software\Wordsmart" Name="installed" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </DirectoryRef>
-    <DirectoryRef Id="TARGETDIR">
-      <Merge Id="VCRedist" SourceFile="$(var.Wordsmart_TargetDir)Microsoft_VC140_CRT_x86.msm" DiskId="1" Language="0"/>
-    </DirectoryRef>
   </Fragment>
 
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-      <Component Id="Wordsmart.exe" Guid="bcdc9128-93d6-4f42-a229-8a9f8ae39aef">
+      <Component Id="Wordsmart.exe" Guid="bcdc9128-93d6-4f42-a229-8a9f8ae39aef" Win64='yes'>
         <File Id="Wordsmart.exe" Name="Wordsmart.exe" Source="$(var.Wordsmart_TargetDir)Wordsmart.exe" />
       </Component>
-      <Component Id="Qt5Core.dll" Guid="E1D5DADC-8B34-4716-AF58-A1199F69C5A4">
+      <Component Id="Qt5Core.dll" Guid="E1D5DADC-8B34-4716-AF58-A1199F69C5A4" Win64='yes'>
         <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.Wordsmart_TargetDir)Qt5Core.dll" />
       </Component>
-      <Component Id="Qt5Gui.dll" Guid="3BEC8E55-6A00-485E-8C63-D4F2E67CF896">
+      <Component Id="Qt5Gui.dll" Guid="3BEC8E55-6A00-485E-8C63-D4F2E67CF896" Win64='yes'>
         <File Id="Qt5Gui.dll" Name="Qt5Gui.dll" Source="$(var.Wordsmart_TargetDir)Qt5Gui.dll" />
       </Component>
-      <Component Id="Qt5Network.dll" Guid="5874A0EA-0295-47EF-BFF6-9DCFFA086195">
+      <Component Id="Qt5Network.dll" Guid="5874A0EA-0295-47EF-BFF6-9DCFFA086195" Win64='yes'>
         <File Id="Qt5Network.dll" Name="Qt5Network.dll" Source="$(var.Wordsmart_TargetDir)Qt5Network.dll" />
       </Component>
-      <Component Id="Qt5Widgets.dll" Guid="80C526D2-F248-446E-93AC-077A5D063733">
+      <Component Id="Qt5Widgets.dll" Guid="80C526D2-F248-446E-93AC-077A5D063733" Win64='yes'>
         <File Id="Qt5Widgets.dll" Name="Qt5Widgets.dll" Source="$(var.Wordsmart_TargetDir)Qt5Widgets.dll" />
       </Component>
-      <Component Id="libEGL.dll" Guid="F80015F0-FAEC-4D9D-9C6E-615515A9493E">
+      <Component Id="libEGL.dll" Guid="F80015F0-FAEC-4D9D-9C6E-615515A9493E" Win64='yes'>
         <File Id="libEGL.dll" Name="libEGL.dll" Source="$(var.Wordsmart_TargetDir)libEGL.dll" />
+      </Component>
+      <Component Id="concrt140.dll" Guid="330691A6-1295-4609-8406-4D14BA811AC0" Win64='yes'>
+        <File Id="concrt140.dll" Name="concrt140.dll" Source="$(var.Wordsmart_TargetDir)concrt140.dll" />
+      </Component>
+      <Component Id="msvcp140.dll" Guid="924A3731-2305-4E8C-8DD1-C8EFEE8DB2F5" Win64='yes'>
+        <File Id="msvcp140.dll" Name="msvcp140.dll" Source="$(var.Wordsmart_TargetDir)msvcp140.dll" />
+      </Component>
+      <Component Id="vccorlib140.dll" Guid="A8EDC797-649B-402C-BD80-D630CEB07B83" Win64='yes'>
+        <File Id="vccorlib140.dll" Name="vccorlib140.dll" Source="$(var.Wordsmart_TargetDir)vccorlib140.dll" />
+      </Component>
+      <Component Id="vcruntime140.dll" Guid="476B3D4E-8D59-4FCC-AF4C-D25A2CA6448C" Win64='yes'>
+        <File Id="vcruntime140.dll" Name="vcruntime140.dll" Source="$(var.Wordsmart_TargetDir)vcruntime140.dll" />
       </Component>
     </ComponentGroup>
   </Fragment>
 
   <Fragment>
     <ComponentGroup Id="PlatformDLL" Directory="platforms">
-      <Component Id="qwindows.dll" Guid="3262BCE7-82E2-4834-8E05-6BDE71395FB9">
+      <Component Id="qwindows.dll" Guid="3262BCE7-82E2-4834-8E05-6BDE71395FB9" Win64='yes'>
         <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.Wordsmart_TargetDir)platforms\qwindows.dll" />
       </Component>
     </ComponentGroup>

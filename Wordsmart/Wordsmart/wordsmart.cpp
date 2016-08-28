@@ -24,7 +24,7 @@ Wordsmart::Wordsmart(QWidget *parent)
 	connect(ui.listWidget_2, &QListWidget::itemPressed, this, &Wordsmart::word_list_clicked);
 
 	ui.textBrowser->viewport()->installEventFilter(this);
-	
+
 	// Set custom right click behavior for list widgets
 	ui.listWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui.listWidget_2, &QListWidget::customContextMenuRequested, this, &Wordsmart::show_context_menu_2);
@@ -65,11 +65,11 @@ void Wordsmart::rename_word_list()
 	if (word_list_manager.is_empty()) return;
 
 	bool result;
-	QString text = QInputDialog::getText(this, 
-		tr("Edit"), 
+	QString text = QInputDialog::getText(this,
+		tr("Edit"),
 		tr("Rename"),
 		QLineEdit::Normal,
-		tr(Util::wstr_to_str(word_list_manager.get_current_word_list().get_name()).c_str()), 
+		tr(Util::wstr_to_str(word_list_manager.get_current_word_list().get_name()).c_str()),
 		&result);
 
 	if (result && !text.isEmpty()) {
@@ -94,7 +94,7 @@ void Wordsmart::delete_word_list()
 	msgBox.setDefaultButton(QMessageBox::Cancel);
 	int ret = msgBox.exec();
 
-	if(ret == QMessageBox::Ok) {
+	if (ret == QMessageBox::Ok) {
 		word_list_manager.delete_current_word_list();
 		fetch_word_list();
 	}
@@ -146,7 +146,7 @@ bool Wordsmart::eventFilter(QObject* target, QEvent* event) {
 	return QWidget::eventFilter(target, event);
 }
 void Wordsmart::show_flashcard() {
-	if(word_list_manager.is_empty()) {
+	if (word_list_manager.is_empty()) {
 		string top_margin = std::to_string(ui.textBrowser->size().height() / 2 - 85);
 		QString qs = "<br><p align=\"center\" style=\"font-size:50px;margin-top:";
 		qs += top_margin.c_str();
@@ -179,7 +179,7 @@ void Wordsmart::show_flashcard() {
 		case 2:
 			qs += "color:yellow;\">";
 			break;
-		default :
+		default:
 			qs += "color:green;\">";
 			break;
 		}
@@ -277,7 +277,7 @@ void Wordsmart::create_action() {
 	connect(ui.actionFlash_Cards, &QAction::triggered, this, &Wordsmart::flash_cards);
 	connect(ui.actionYour_Word_List, &QAction::triggered, this, &Wordsmart::word_list);
 	connect(ui.actionDownload_Online, &QAction::triggered, this, &Wordsmart::show_download_words);
-	
+
 }
 void Wordsmart::show_download_words()
 {
@@ -288,7 +288,19 @@ void Wordsmart::flash_cards() {
 	show_flashcard();
 }
 void Wordsmart::fetch_word_list() {
-	if (word_list_manager.is_empty()) return;
+	if (word_list_manager.is_empty()) {
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			// Remove the rest of the ListWidget
+			ui.listWidget->takeItem(i);
+			i--;
+		}
+
+		for (int i = 0; i < ui.listWidget_2->count(); i++) {
+			ui.listWidget_2->takeItem(i);
+			i--;
+		}
+		return;
+	}
 
 	// If current word list is not empty, fetch it
 	auto& my_word_list = word_list_manager.get_current_word_list().get_words();
@@ -344,7 +356,7 @@ void Wordsmart::fetch_word_list() {
 	for (int i = 0; i < ui.listWidget_2->count(); i++) {
 		ui.listWidget_2->item(i)->setTextColor(word_lists[i].get_color());
 	}
-	
+
 }
 void Wordsmart::word_list() {
 	ui.stackedWidget->setCurrentIndex(1);
@@ -395,9 +407,6 @@ void Wordsmart::delete_word()
 	word_list_manager.delete_current_word(current_selected_word);
 
 	fetch_word_list();
-
-
-	
 }
 Wordsmart::~Wordsmart()
 {
