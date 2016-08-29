@@ -142,6 +142,7 @@ p, li { white-space: pre-wrap; }
     <addaction name="actionFlash_Cards"/>
     <addaction name="actionYour_Word_List"/>
     <addaction name="actionDownload_Online"/>
+    <addaction name="actionOptions"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuWho"/>
@@ -173,6 +174,11 @@ p, li { white-space: pre-wrap; }
   <action name="actionDownload_Online">
    <property name="text">
     <string>Download Wordlist</string>
+   </property>
+  </action>
+  <action name="actionOptions">
+   <property name="text">
+    <string>Options</string>
    </property>
   </action>
  </widget>

@@ -36,6 +36,7 @@ public:
     QAction *actionFlash_Cards;
     QAction *actionYour_Word_List;
     QAction *actionDownload_Online;
+    QAction *actionOptions;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     QStackedWidget *stackedWidget;
@@ -74,6 +75,8 @@ public:
         actionYour_Word_List->setObjectName(QStringLiteral("actionYour_Word_List"));
         actionDownload_Online = new QAction(WordsmartClass);
         actionDownload_Online->setObjectName(QStringLiteral("actionDownload_Online"));
+        actionOptions = new QAction(WordsmartClass);
+        actionOptions->setObjectName(QStringLiteral("actionOptions"));
         centralWidget = new QWidget(WordsmartClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -189,6 +192,7 @@ public:
         menu->addAction(actionFlash_Cards);
         menu->addAction(actionYour_Word_List);
         menu->addAction(actionDownload_Online);
+        menu->addAction(actionOptions);
 
         retranslateUi(WordsmartClass);
 
@@ -205,6 +209,7 @@ public:
         actionFlash_Cards->setText(QApplication::translate("WordsmartClass", "Flash Cards", 0));
         actionYour_Word_List->setText(QApplication::translate("WordsmartClass", "Your Word List", 0));
         actionDownload_Online->setText(QApplication::translate("WordsmartClass", "Download Wordlist", 0));
+        actionOptions->setText(QApplication::translate("WordsmartClass", "Options", 0));
         textBrowser->setHtml(QApplication::translate("WordsmartClass", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
