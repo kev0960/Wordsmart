@@ -173,10 +173,9 @@ void Wordsmart::show_flashcard() {
 
 		switch (current_word_list.memorize_count()) {
 		case 0:
-		case 1:
 			qs += "color:red;\">";
 			break;
-		case 2:
+		case 1:
 			qs += "color:yellow;\">";
 			break;
 		default:
@@ -194,10 +193,10 @@ void Wordsmart::show_flashcard() {
 		qs += top_margin.c_str();
 		qs += "\">";
 
-		string word = current_word_list.get_word();
+		wstring word = current_word_list.get_word();
 		word[0] = toupper(word[0]);
 
-		qs += word.c_str();
+		qs += Util::wstr_to_str(word).c_str();
 		qs += "</p>";
 		// Set to show the word
 		ui.textBrowser->setText(qs);
@@ -206,9 +205,9 @@ void Wordsmart::show_flashcard() {
 		WordInfo* w = my_words.get_word_info(current_word_list.get_word());
 
 		QString qs = "<h2 style='font-family:Verdana'> ";
-		string word = w->get_word().c_str();
+		wstring word = w->get_word();
 		word[0] = toupper(word[0]);
-		qs += word.c_str();
+		qs += Util::wstr_to_str(word).c_str();
 		qs += "</h2><span> ";
 
 		for (int i = 0; i < w->num_def(); i++) {
@@ -259,7 +258,7 @@ void Wordsmart::clipboard_changed()
 	ui.textBrowser->setText(clipboard->text());
 	if (clipboard->text().length() >= 30) return;
 
-	my_words.register_word(clipboard->text().toStdString());
+	my_words.register_word(clipboard->text().toStdWString());
 	connect(&my_words, &Words::defFound, this, &Wordsmart::word_is_found);
 }
 void Wordsmart::show_version()
@@ -321,8 +320,8 @@ void Wordsmart::fetch_word_list() {
 			i--;
 			continue;
 		}
-		if (item->text().toStdString() != itr->first) {
-			ui.listWidget->insertItem(i, (itr->first).c_str());
+		if (item->text().toStdWString() != itr->first) {
+			ui.listWidget->insertItem(i, Util::wstr_to_str(itr->first).c_str());
 		}
 		itr++;
 	}
@@ -371,13 +370,13 @@ void Wordsmart::word_is_found(const WordInfo& w)
 }
 void Wordsmart::word_clicked(QListWidgetItem *item)
 {
-	current_selected_word = item->text().toStdString();
+	current_selected_word = item->text().toStdWString();
 	WordInfo* w = my_words.get_word_info(current_selected_word);
 
 	QString qs = "<h2> ";
-	string word = w->get_word().c_str();
+	wstring word = w->get_word();
 	word[0] = toupper(word[0]);
-	qs += word.c_str();
+	qs += Util::wstr_to_str(word).c_str();
 	qs += "</h2><span> ";
 
 	for (int i = 0; i < w->num_def(); i++) {

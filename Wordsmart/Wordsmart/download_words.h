@@ -275,7 +275,7 @@ public:
 
 		for (int i = 0; i < (max_download > downloading_words.size() ? downloading_words.size() : max_download); i++) {
 			word_infos[i] = new WordInfo();
-			word_infos[i]->set_word(Util::wstr_to_str(downloading_words[i]));
+			word_infos[i]->set_word(downloading_words[i]);
 
 			current_download_word[i] = downloading_words[i];
 			download_word(i);
@@ -349,7 +349,7 @@ public:
 		int index = idx / 2;
 		if (download_done[index]) {
 			bool result = words->register_word(
-				Util::wstr_to_str(current_download_word[index]),
+				current_download_word[index],
 				word_infos[index]
 			);
 
@@ -364,7 +364,7 @@ public:
 			if (total_download < downloading_words.size()) {
 				current_download_word[index] = downloading_words[total_download];
 				word_infos[index] = new WordInfo();
-				word_infos[index]->set_word(Util::wstr_to_str(downloading_words[total_download]));
+				word_infos[index]->set_word(downloading_words[total_download]);
 
 				disconnect(word_response[index * 2], 0, 0, 0);
 				disconnect(word_response[index * 2 + 1], 0, 0, 0);
@@ -381,7 +381,7 @@ public:
 				// When the download is done, add it to my word list
 				WordList new_word_list(donwloading_wordlist_name);
 				for (int i = 0; i < downloading_words.size(); i++) {
-					new_word_list.add_word(Util::wstr_to_str(downloading_words[i]));
+					new_word_list.add_word(downloading_words[i]);
 				}
 				words_manager->add_word_list(new_word_list);
 				download_in_progress = false; 

@@ -176,7 +176,7 @@ public:
 };
 
 class WordList {
-	vector<std::pair<string, Memorize>> words;
+	vector<std::pair<wstring, Memorize>> words;
 	wstring name;
 
 	int current_word;
@@ -193,11 +193,11 @@ public:
 
 	}
 
-	vector<std::pair<string, Memorize>> get_words() {
+	vector<std::pair<wstring, Memorize>> get_words() {
 		return words;
 	}
 
-	bool add_word(string s) {
+	bool add_word(wstring s) {
 		for (int i = 0; i < words.size(); i++) {
 			if (words[i].first == s) return false; 
 		}
@@ -209,7 +209,7 @@ public:
 
 		return true;
 	}
-	bool add_word(string s, Memorize& mem) {
+	bool add_word(wstring s, Memorize& mem) {
 		for (int i = 0; i < words.size(); i++) {
 			if (words[i].first == s) return false;
 		}
@@ -222,7 +222,7 @@ public:
 		return true;
 	}
 
-	bool delete_word(string word) {
+	bool delete_word(wstring word) {
 		for (int i = 0; i < words.size(); i++) {
 			if (words[i].first == word) {
 				words.erase(words.begin() + i);
@@ -233,7 +233,7 @@ public:
 		}
 		return false; 
 	}
-	bool set_memorization(string word, int sc)
+	bool set_memorization(wstring word, int sc)
 	{
 		for (int i = 0; i < words.size(); i++) {
 			if (words[i].first == word) {
@@ -312,11 +312,11 @@ public:
 		return true;
 	}
 
-	string get_word() {
+	wstring get_word() {
 		if (current_word != -1) {
 			return words[current_word].first;
 		}
-		return "";
+		return L"";
 	}
 
 	bool all_words_memorized() {
@@ -419,7 +419,7 @@ public:
 	}
 	// Returns true if the word is added to the previous word list
 	// Returns false if a new word list is created and the word is added to it
-	bool add_word(string word) {
+	bool add_word(wstring word) {
 		time_t t = time(0);
 		struct tm* time_info = localtime(&t);
 
@@ -449,7 +449,7 @@ public:
 			auto words = word_lists[i].get_words();
 			for (int j = 0; j < words.size(); j++) {
 				out << L"<word word=\""
-					<< Util::str_to_wstr(words[j].first)
+					<< words[j].first
 					<< "\">"
 					<< words[j].second.stringify() << "</word>";
 			}
@@ -457,7 +457,7 @@ public:
 		}
 	}
 
-	bool delete_current_word(string word) {
+	bool delete_current_word(wstring word) {
 		if (current_word_list < word_lists.size()) {
 			return word_lists[current_word_list].delete_word(word);
 		}
@@ -476,7 +476,7 @@ public:
 class WordInfo : public QObject {
 	Q_OBJECT
 
-	string word;
+	wstring word;
 	vector<wstring> kr_definition;
 	vector<wstring> en_definition;
 
@@ -505,21 +505,21 @@ class WordInfo : public QObject {
 
 signals:
 	// Signal when the definition of the word is fully fetched and parsed
-	void def_found(string word);
+	void def_found(wstring word);
 	void kr_def_found();
 	void en_def_found();
 
 public:
-	WordInfo(string word) : word(word), kr_def_parse_done(false), en_def_parse_done(false), QObject(Q_NULLPTR) {
-		if (word == "") return;
+	WordInfo(wstring word) : word(word), kr_def_parse_done(false), en_def_parse_done(false), QObject(Q_NULLPTR) {
+		if (word == L"") return;
 
 		string url_kr_dic =
 			"http://alldic.daum.net/search.do?q="
-			+ word;
+			+ Util::wstr_to_str(word);
 
 		string url_en_dic =
 			"http://wordnetweb.princeton.edu/perl/webwn?s="
-			+ word
+			+ Util::wstr_to_str(word)
 			+ "&sub=Search+WordNet&o2=&o0=1&o8=1&o1=1&o7=&o5=&o9=&o6=&o3=&o4=&h=0000";
 
 		QUrl search_url_kr(url_kr_dic.c_str());
@@ -539,7 +539,7 @@ public:
 		kr_definition = w.kr_definition;
 		en_definition = w.en_definition;
 	}
-	WordInfo(string word, vector<wstring>& kr_definition, vector<wstring>& en_definition)
+	WordInfo(wstring word, vector<wstring>& kr_definition, vector<wstring>& en_definition)
 		: word(word), kr_definition(kr_definition), en_definition(en_definition)
 	{
 
@@ -777,8 +777,8 @@ public:
 		return en_definition.size();
 	}
 
-	string get_word() const { return word;  }
-	void set_word(string s) { word = s; }
+	wstring get_word() const { return word;  }
+	void set_word(wstring s) { word = s; }
 
 	void inc_freqeuncy() { frequency++; }
 	int get_frequency() { return frequency; }
@@ -800,7 +800,7 @@ public:
 	bool write_file(std::wofstream& o) {
 		if (!o) return false;
 
-		o << L"<word word=\"" << Util::str_to_wstr(word) << L"\">";
+		o << L"<word word=\"" << word << L"\">";
 		for (int i = 0; i < kr_definition.size(); i++) {
 			o << L"<kr_def>" << kr_definition[i] << L"</kr_def>";
 		}
@@ -816,13 +816,13 @@ class Words : public QObject {
 	Q_OBJECT
 
 private:
-	map<string, WordInfo*> registered_words;
+	map<wstring, WordInfo*> registered_words;
 
 	// Found word 
-	std::set<string> found_words;
+	std::set<wstring> found_words;
 
 	// convert a word into a standard format
-	void normalize_word(string& word) {
+	void normalize_word(wstring& word) {
 		for (int i = 0; i < word.size(); i++) {
 			word[i] = tolower(word[i]);
 		}
@@ -832,7 +832,7 @@ signals:
 	void defFound(const WordInfo& word);
 
 public:
-	bool register_word(string word) {
+	bool register_word(wstring word) {
 		if (!is_word(word)) return false;
 
 		normalize_word(word);
@@ -856,7 +856,7 @@ public:
 
 		return true;
 	}
-	bool register_word(string word, WordInfo* word_info) {
+	bool register_word(wstring word, WordInfo* word_info) {
 		if (registered_words.find(word) == registered_words.end()) {
 			registered_words[word] = word_info;
 			found_words.insert(word);
@@ -865,7 +865,7 @@ public:
 		return false;
 	}
 
-	void word_is_found(string word) {
+	void word_is_found(wstring word) {
 		emit defFound(*registered_words[word]);
 	}
 
@@ -879,7 +879,7 @@ public:
 	// 2. Not having special characters
 	// (But punctuation marks would be removed, like period, comman, parenthesis, etc. ) 
 
-	bool is_word(string& word) {
+	bool is_word(wstring& word) {
 		bool separate_found = false;
 		if (word.size() >= 30) return false; 
 
@@ -910,11 +910,11 @@ public:
 		return true;
 	}
 
-	std::set<string>& get_word_list() {
+	std::set<wstring>& get_word_list() {
 		return found_words;
 	}
 
-	WordInfo* get_word_info(string w) {
+	WordInfo* get_word_info(wstring w) {
 		if (found_words.find(w) != found_words.end()) {
 			return registered_words[w];
 		}
@@ -932,7 +932,7 @@ public:
 
 		return true;
 	}
-	bool delete_word(string word) {
+	bool delete_word(wstring word) {
 		if (registered_words.find(word) != registered_words.end()) {
 			registered_words.erase(word);
 			found_words.erase(word);
@@ -959,7 +959,7 @@ public:
 			if (itr->tag == L"word") {
 				if (current_word.size()) {
 					// Register the previous current_word
-					string s_word = Util::wstr_to_str(current_word);
+					wstring s_word = current_word;
 					found_words.insert(s_word);
 
 					registered_words[s_word] = new WordInfo(s_word, kr_definition, en_definition);
@@ -982,7 +982,7 @@ public:
 
 		if (current_word.size()) {
 			// Register the previous current_word
-			string s_word = Util::wstr_to_str(current_word);
+			wstring s_word = current_word;
 			found_words.insert(s_word);
 			registered_words[s_word] = new WordInfo(s_word, kr_definition, en_definition);
 		}
@@ -998,7 +998,7 @@ public:
 			if (itr->tag == L"wordlist") {
 				if (word_list_name != L"") {
 					if (word != L"") {
-						word_list.add_word(Util::wstr_to_str(word), m);
+						word_list.add_word(word, m);
 					}
 					word_list_manager.add_word_list(word_list);
 
@@ -1013,7 +1013,7 @@ public:
 			else if (itr->tag == L"word") {
 				// Add the previous mem and score to the word list
 				if (word != L"") {
-					word_list.add_word(Util::wstr_to_str(word), m);
+					word_list.add_word(word, m);
 				}
 
 				word = itr->attr[L"word"];
@@ -1029,7 +1029,7 @@ public:
 		
 		if (word_list_name != L"") {
 			if (word != L"") {
-				word_list.add_word(Util::wstr_to_str(word), m);
+				word_list.add_word(word, m);
 			}
 			word_list_manager.add_word_list(word_list);
 

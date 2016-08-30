@@ -38,9 +38,9 @@ void Notify::show_notification(const WordInfo& w)
 	timer_id = startTimer(1000 * 8);
 
 	QString qs = "<h2 style='font-family:Verdana'> ";
-	string word = w.get_word().c_str();
+	wstring word = w.get_word();
 	word[0] = toupper(word[0]);
-	qs += word.c_str();
+	qs += Util::wstr_to_str(word).c_str();
 	qs += "</h2><span> ";
 
 	for (int i = 0; i < w.num_def(); i++) {

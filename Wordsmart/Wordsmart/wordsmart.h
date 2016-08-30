@@ -44,7 +44,7 @@ private:
 
 	WordListManager word_list_manager;
 	Words my_words;
-	string current_selected_word;
+	wstring current_selected_word;
 
 	// Because qttextbrowser does not support click event, we have to manually 
 	// override it through installing custom eventfilter

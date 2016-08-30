@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_WordInfo_t {
     QByteArrayData data[7];
-    char stringdata0[58];
+    char stringdata0[59];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,13 +32,13 @@ static const qt_meta_stringdata_WordInfo_t qt_meta_stringdata_WordInfo = {
 QT_MOC_LITERAL(0, 0, 8), // "WordInfo"
 QT_MOC_LITERAL(1, 9, 9), // "def_found"
 QT_MOC_LITERAL(2, 19, 0), // ""
-QT_MOC_LITERAL(3, 20, 6), // "string"
-QT_MOC_LITERAL(4, 27, 4), // "word"
-QT_MOC_LITERAL(5, 32, 12), // "kr_def_found"
-QT_MOC_LITERAL(6, 45, 12) // "en_def_found"
+QT_MOC_LITERAL(3, 20, 7), // "wstring"
+QT_MOC_LITERAL(4, 28, 4), // "word"
+QT_MOC_LITERAL(5, 33, 12), // "kr_def_found"
+QT_MOC_LITERAL(6, 46, 12) // "en_def_found"
 
     },
-    "WordInfo\0def_found\0\0string\0word\0"
+    "WordInfo\0def_found\0\0wstring\0word\0"
     "kr_def_found\0en_def_found"
 };
 #undef QT_MOC_LITERAL
@@ -75,7 +75,7 @@ void WordInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         WordInfo *_t = static_cast<WordInfo *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->def_found((*reinterpret_cast< string(*)>(_a[1]))); break;
+        case 0: _t->def_found((*reinterpret_cast< wstring(*)>(_a[1]))); break;
         case 1: _t->kr_def_found(); break;
         case 2: _t->en_def_found(); break;
         default: ;
@@ -84,7 +84,7 @@ void WordInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (WordInfo::*_t)(string );
+            typedef void (WordInfo::*_t)(wstring );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&WordInfo::def_found)) {
                 *result = 0;
                 return;
@@ -144,7 +144,7 @@ int WordInfo::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void WordInfo::def_found(string _t1)
+void WordInfo::def_found(wstring _t1)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

@@ -1,10 +1,2 @@
-﻿  Uic'ing wordsmart.ui...
-  moc_def_notify.cpp
-  moc_download_words.cpp
-  moc_words.cpp
-  moc_wordsmart.cpp
-  def_notify.cpp
-  main.cpp
-  wordsmart.cpp
-  Generating Code...
+﻿  wordsmart.cpp
   Wordsmart.vcxproj -> C:\Users\Jaebum Lee\Source\Repos\Wordsmart\Wordsmart\x64\Release\Wordsmart.exe
